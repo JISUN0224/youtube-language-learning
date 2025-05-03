@@ -60,15 +60,29 @@ async function fetchSubtitles() {
 function processSubtitles() {
     subtitles.forEach(sub => {
         const text = sub.text;
-        const match = text.match(/[\u4e00-\u9fa5]{2,}/); // 2자 이상 한자
-        if (match) {
-            const word = match[0];
-            sub.processedText = text.replace(word, `<span class="placeholder" data-word="${word}">(___)</span>`);
+        const words = jieba.cut(text); // jieba로 단어 분리
+        if (!words.length) {
+            sub.processedText = text;
+            return;
+        }
+
+        // 길이 2 이상인 단어 중 무작위 선택
+        const candidates = words.filter(w => w.length >= 2);
+        const selectedWord = candidates.length > 0 ? 
+                             candidates[Math.floor(Math.random() * candidates.length)] : null;
+
+        // 단어를 괄호로 감싸기
+        if (selectedWord) {
+            const replaced = words.map(w =>
+                w === selectedWord ? `<span class="placeholder" data-word="${w}">(___)</span>` : w
+            ).join('');
+            sub.processedText = replaced;
         } else {
             sub.processedText = text;
         }
     });
 }
+
 
 function displaySubtitles() {
     const container = document.getElementById('subtitles');
