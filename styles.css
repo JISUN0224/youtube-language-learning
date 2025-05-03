@@ -82,19 +82,3 @@ h1 {
   background-color: #fff8dc;
   border-left: 3px solid #ffc107;
 }
-
-.placeholder {
-  background: #ddd;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.placeholder:hover {
-  background: #bbb;
-}
-
-.placeholder.revealed {
-  background: #c8e6c9;
-  font-weight: bold;
-}
