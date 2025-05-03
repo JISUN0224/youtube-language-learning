@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Language Learning Tool</title>
+    <title>중국어 학습 도구 - YouTube Language Learning</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>YouTube Language Learning</h1>
+        <h1>중국어 학습 도구</h1>
+        
+        <div class="instructions">
+            <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 중국어 자막이 있는 동영상을 사용해주세요.</p>
+            <p>괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
+        </div>
         
         <div class="video-container">
             <div id="player"></div>
         </div>
         
         <div class="controls">
-            <input type="text" id="videoId" placeholder="YouTube Video ID">
-            <button id="loadVideo">Load Video</button>
+            <input type="text" id="videoId" placeholder="YouTube 비디오 ID를 입력하세요">
+            <button id="loadVideo">비디오 로드</button>
         </div>
         
         <div class="subtitle-container">
-            <div id="subtitles"></div>
+            <div id="subtitles">
+                <div class="initial-message">비디오를 로드하면 이곳에 중국어 자막이 표시됩니다.</div>
+            </div>
         </div>
     </div>
 
