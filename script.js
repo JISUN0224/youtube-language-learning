@@ -106,7 +106,7 @@ function displaySubtitles() {
 function updateSubtitleHighlight() {
     if (!player || !subtitles.length) return;
 
-    const currentTime = player.getCurrentTime();
+    const currentTime = player.getCurrentTime()+8;
 
     subtitles.forEach((sub, index) => {
         const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
