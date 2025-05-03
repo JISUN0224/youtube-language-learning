@@ -70,7 +70,7 @@ function displaySubtitles() {
 function updateSubtitleHighlight() {
   if (!player || !subtitles.length) return;
 
-  const currentTime = player.getCurrentTime() + 5.5; // 동기화 보정
+  const currentTime = player.getCurrentTime() + 5; // 동기화 보정
 
   subtitles.forEach((sub, index) => {
     const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
