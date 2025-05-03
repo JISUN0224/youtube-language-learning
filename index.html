@@ -3,30 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>중국어 학습 도구 - YouTube Language Learning</title>
+    <title>중국어 학습 도구 - 산사나무의 사랑</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>중국어 학습 도구</h1>
+        <h1>중국어 학습 도구 - 山楂树之恋</h1>
         
         <div class="instructions">
-            <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 중국어 자막이 있는 동영상을 사용해주세요.</p>
-            <p>괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
+            <p>1. YouTube 동영상 ID 또는 URL을 입력하세요.</p>
+            <p>2. 자막 파일(.smi 형식)을 업로드하세요.</p>
+            <p>3. 영상이 재생되면 자막이 아래에 표시됩니다.</p>
+            <p>4. 괄호로 가려진 단어를 클릭하면 원래 단어가 표시됩니다.</p>
+        </div>
+        
+        <div class="setup-container">
+            <div class="input-group">
+                <label for="videoInput">YouTube 동영상 ID 또는 URL:</label>
+                <input type="text" id="videoInput" value="_jH43kM0B2U" placeholder="예: _jH43kM0B2U 또는 https://www.youtube.com/watch?v=_jH43kM0B2U">
+            </div>
+            
+            <div class="input-group">
+                <label for="subtitleFile">자막 파일 업로드 (.smi):</label>
+                <input type="file" id="subtitleFile" accept=".smi">
+            </div>
+            
+            <div class="config-group">
+                <label for="difficultySlider">단어 난이도:</label>
+                <input type="range" id="difficultySlider" min="1" max="3" value="2" step="1">
+                <span id="difficultyValue">중급</span>
+                
+                <label for="percentageSlider">괄호 처리 비율 (%):</label>
+                <input type="range" id="percentageSlider" min="10" max="50" value="30" step="5">
+                <span id="percentageValue">30%</span>
+            </div>
+            
+            <button id="loadButton">시작하기</button>
         </div>
         
         <div class="video-container">
             <div id="player"></div>
         </div>
         
-        <div class="controls">
-            <input type="text" id="videoId" placeholder="YouTube 비디오 ID를 입력하세요">
-            <button id="loadVideo">비디오 로드</button>
-        </div>
-        
         <div class="subtitle-container">
             <div id="subtitles">
-                <div class="initial-message">비디오를 로드하면 이곳에 중국어 자막이 표시됩니다.</div>
+                <div class="initial-message">자막 파일을 업로드하고 시작하기 버튼을 클릭하세요.</div>
             </div>
         </div>
     </div>
