@@ -68,19 +68,22 @@ function displaySubtitles() {
 }
 
 function updateSubtitleHighlight() {
-    if (!player || !subtitles.length) return;
+  if (!player || !subtitles.length) return;
 
-    const currentTime = player.getCurrentTime() + 8; // 🔧 동기화 보정
+  const currentTime = player.getCurrentTime() + 5.5; // 동기화 보정
 
-    subtitles.forEach((sub, index) => {
-        const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
-        if (el) {
-            if (currentTime >= sub.start && currentTime <= sub.end) {
-                el.classList.add('highlight');
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            } else {
-                el.classList.remove('highlight');
-            }
-        }
-    });
+  subtitles.forEach((sub, index) => {
+    const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
+    const nextStart = subtitles[index + 1]?.start ?? Infinity;
+
+    if (!el) return;
+
+    if (currentTime >= sub.start && currentTime < nextStart) {
+      el.classList.add('highlight');
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      el.classList.remove('highlight');
+    }
+  });
 }
+
