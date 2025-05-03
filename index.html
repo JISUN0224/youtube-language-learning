@@ -3,18 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>중국어 학습 도구 - YouTube Language Learning</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>중국어 학습 도구 - 산사나무의 사랑</title>
+    <style>
+        body { 
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', Arial, sans-serif; 
+            line-height: 1.8; 
+            margin: 0; 
+            padding: 20px; 
+            background-color: #f5f5f5; 
+        } 
+        
+        .container { 
+            max-width: 800px; 
+            margin: 0 auto; 
+            background-color: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        } 
+        
+        h1 { 
+            text-align: center; 
+            color: #333; 
+            margin-bottom: 20px; 
+        } 
+        
+        .instructions { 
+            background-color: #f0f8ff; 
+            padding: 15px; 
+            border-radius: 5px; 
+            font-size: 14px; 
+            margin-bottom: 20px; 
+        } 
+        
+        .video-container { 
+            position: relative; 
+            padding-bottom: 56.25%; /* 16:9 비율 */ 
+            height: 0; 
+            overflow: hidden; 
+            margin-bottom: 20px; 
+            border-radius: 5px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        } 
+        
+        #player { 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+        } 
+        
+        .controls { 
+            margin-bottom: 20px; 
+            display: flex; 
+            gap: 10px; 
+        } 
+        
+        button { 
+            padding: 10px 15px; 
+            background-color: #4285f4; 
+            color: white; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: background-color 0.2s; 
+        } 
+        
+        button:hover { 
+            background-color: #3367d6; 
+        } 
+        
+        .subtitle-container { 
+            background-color: #f9f9f9; 
+            padding: 20px; 
+            border-radius: 5px; 
+            min-height: 200px; 
+            max-height: 400px;
+            overflow-y: auto;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+            font-size: 18px; 
+        } 
+        
+        .subtitle-line { 
+            margin-bottom: 15px; 
+            padding: 10px; 
+            border-radius: 4px; 
+            transition: background-color 0.3s; 
+        } 
+        
+        .highlight { 
+            background-color: #fffde7; 
+            border-left: 3px solid #ffd600; 
+        } 
+        
+        .placeholder { 
+            background-color: #e0e0e0; 
+            border-radius: 3px; 
+            padding: 0 4px; 
+            margin: 0 2px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        } 
+        
+        .placeholder:hover { 
+            background-color: #d0d0d0; 
+        } 
+        
+        .placeholder.revealed { 
+            background-color: #bbdefb; 
+            font-weight: bold; 
+        } 
+        
+        .loading, .error, .initial-message { 
+            text-align: center; 
+            padding: 20px; 
+            color: #666; 
+        } 
+        
+        .error { 
+            color: #f44336; 
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1>중국어 학습 도구</h1>
+        <h1>중국어 학습 도구 - 산사나무의 사랑</h1>
         
         <div class="instructions">
-            <p>1. YouTube 동영상 ID를 입력하세요.</p>
-            <p>2. 자막 파일(.smi, .srt, .vtt)을 업로드하세요.</p>
-            <p>3. "비디오 및 자막 로드" 버튼을 클릭하세요.</p>
-            <p>4. 괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
+            <p>"산사나무의 사랑 (山楂树之恋)" 영화의 중국어 자막과 함께 학습합니다.</p>
+            <p>괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
         </div>
         
         <div class="video-container">
@@ -22,18 +141,242 @@
         </div>
         
         <div class="controls">
-            <input type="text" id="videoId" placeholder="YouTube 비디오 ID를 입력하세요">
-            <input type="file" id="subtitleFile" accept=".smi,.srt,.vtt">
-            <button id="loadVideoAndSubtitles">비디오 및 자막 로드</button>
+            <button id="loadVideo">영상 및 자막 로드</button>
+            <button id="reprocessButton">자막 다시 처리</button>
         </div>
         
         <div class="subtitle-container">
             <div id="subtitles">
-                <div class="initial-message">비디오와 자막 파일을 로드하면 이곳에 중국어 자막이 표시됩니다.</div>
+                <div class="initial-message">위의 버튼을 클릭하여 영상과 자막을 로드하세요.</div>
             </div>
         </div>
     </div>
+
     <script src="https://www.youtube.com/iframe_api"></script>
-    <script src="script.js"></script>
+    <script>
+        // 전역 변수
+        let player;
+        let subtitles = [];
+        let currentSubtitleIndex = -1;
+        let subtitleUpdateInterval;
+        const videoId = '_jH43kM0B2U'; // 산사나무의 사랑 트레일러
+        
+        // 페이지 로드 시 초기화
+        window.onload = function() {
+            document.getElementById('loadVideo').addEventListener('click', loadVideoAndSubtitles);
+            document.getElementById('reprocessButton').addEventListener('click', reprocessSubtitles);
+        };
+        
+        // YouTube API 콜백 함수
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: videoId,
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+        
+        // 플레이어 준비 완료
+        function onPlayerReady(event) {
+            console.log('Player ready');
+        }
+        
+        // 플레이어 상태 변경
+        function onPlayerStateChange(event) {
+            // 재생 중일 때만 자막 업데이트
+            if (event.data === YT.PlayerState.PLAYING) {
+                // 이전 인터벌이 있으면 제거
+                clearInterval(subtitleUpdateInterval);
+                // 새 인터벌 설정
+                subtitleUpdateInterval = setInterval(updateSubtitleHighlight, 100);
+            } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+                // 재생이 멈추면 인터벌 제거
+                clearInterval(subtitleUpdateInterval);
+            }
+        }
+        
+        // 비디오와 자막 로드
+        function loadVideoAndSubtitles() {
+            player.loadVideoById(videoId);
+            
+            // 로딩 메시지 표시
+            const subtitlesContainer = document.getElementById('subtitles');
+            subtitlesContainer.innerHTML = '<div class="loading">자막을 불러오는 중...</div>';
+            
+            // GitHub에 업로드된 JSON 파일 로드
+            fetch('subtitles.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('자막 파일을 찾을 수 없습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.videoId === videoId && data.subtitles && data.subtitles.length > 0) {
+                        subtitles = data.subtitles;
+                        processSubtitles();
+                        displaySubtitles();
+                    } else {
+                        throw new Error('자막 데이터가 올바르지 않습니다.');
+                    }
+                })
+                .catch(error => {
+                    console.error('자막 로드 오류:', error);
+                    subtitlesContainer.innerHTML = `<div class="error">자막을 불러오는 중 오류가 발생했습니다: ${error.message}</div>`;
+                });
+        }
+        
+        // 자막 재처리
+        function reprocessSubtitles() {
+            if (subtitles.length === 0) {
+                alert('먼저 자막을 로드해주세요.');
+                return;
+            }
+            
+            processSubtitles();
+            displaySubtitles();
+        }
+        
+        // 자막 처리 (단어 선택 및 괄호 처리)
+        function processSubtitles() {
+            // 모든 자막 라인에 대해 처리
+            subtitles.forEach(sub => {
+                const text = sub.text;
+                
+                // 중국어 단어 찾기 (2자 이상인 단어 찾기)
+                let processedText = '';
+                let inWord = false;
+                let currentWord = '';
+                let currentWordStart = 0;
+                let positions = [];
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text[i];
+                    
+                    // 한자 범위인지 확인
+                    const isChineseChar = /[\u4e00-\u9fa5\u3400-\u4dbf]/.test(char);
+                    
+                    if (isChineseChar) {
+                        if (!inWord) {
+                            currentWordStart = i;
+                            inWord = true;
+                        }
+                        currentWord += char;
+                    } else {
+                        if (inWord) {
+                            if (currentWord.length >= 2) {
+                                positions.push({
+                                    start: currentWordStart,
+                                    end: i,
+                                    word: currentWord
+                                });
+                            }
+                            inWord = false;
+                            currentWord = '';
+                        }
+                    }
+                }
+                
+                // 마지막 단어 처리
+                if (inWord && currentWord.length >= 2) {
+                    positions.push({
+                        start: currentWordStart,
+                        end: text.length,
+                        word: currentWord
+                    });
+                }
+                
+                // 일정 비율의 단어만 괄호로 처리 (약 30%)
+                const wordsToHide = Math.ceil(positions.length * 0.3);
+                const selectedPositions = [];
+                
+                // 무작위로 단어 선택
+                while (selectedPositions.length < wordsToHide && positions.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * positions.length);
+                    selectedPositions.push(positions[randomIndex]);
+                    positions.splice(randomIndex, 1);
+                }
+                
+                // 선택된 위치를 start 기준으로 정렬
+                selectedPositions.sort((a, b) => a.start - b.start);
+                
+                // 텍스트에 괄호 처리 적용
+                let lastIndex = 0;
+                processedText = '';
+                
+                for (const pos of selectedPositions) {
+                    processedText += text.substring(lastIndex, pos.start);
+                    processedText += `<span class="placeholder" data-word="${pos.word}">(___)</span>`;
+                    lastIndex = pos.end;
+                }
+                
+                // 나머지 텍스트 추가
+                processedText += text.substring(lastIndex);
+                
+                sub.processedText = processedText;
+            });
+        }
+        
+        // 자막 표시
+        function displaySubtitles() {
+            const subtitlesContainer = document.getElementById('subtitles');
+            subtitlesContainer.innerHTML = '';
+            
+            subtitles.forEach((sub, index) => {
+                const div = document.createElement('div');
+                div.className = 'subtitle-line';
+                div.dataset.index = index;
+                div.dataset.start = sub.start;
+                div.dataset.end = sub.end;
+                div.innerHTML = sub.processedText || sub.text;
+                subtitlesContainer.appendChild(div);
+            });
+            
+            // 괄호 클릭 이벤트 추가
+            document.querySelectorAll('.placeholder').forEach(el => {
+                el.addEventListener('click', function() {
+                    this.innerHTML = this.dataset.word;
+                    this.classList.add('revealed');
+                });
+            });
+        }
+        
+        // 현재 재생 시간에 맞는 자막 하이라이트
+        function updateSubtitleHighlight() {
+            if (!player || subtitles.length === 0) return;
+            
+            const currentTime = player.getCurrentTime();
+            let newIndex = -1;
+            
+            // 현재 시간에 맞는 자막 찾기
+            for (let i = 0; i < subtitles.length; i++) {
+                if (currentTime >= subtitles[i].start && currentTime <= subtitles[i].end) {
+                    newIndex = i;
+                    break;
+                }
+            }
+            
+            // 인덱스가 변경되었을 때만 업데이트
+            if (newIndex !== currentSubtitleIndex) {
+                document.querySelectorAll('.subtitle-line').forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                
+                if (newIndex !== -1) {
+                    const current = document.querySelector(`.subtitle-line[data-index="${newIndex}"]`);
+                    if (current) {
+                        current.classList.add('highlight');
+                        current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                
+                currentSubtitleIndex = newIndex;
+            }
+        }
+    </script>
 </body>
 </html>
