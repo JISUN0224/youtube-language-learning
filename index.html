@@ -1,99 +1,30 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>중국어 학습 도구 - 테스트</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .placeholder {
-            background-color: #f0f0f0;
-            padding: 0 4px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-        .placeholder.revealed {
-            background-color: #e1f5fe;
-        }
-        #subtitles {
-            margin-top: 20px;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 5px;
-        }
-    </style>
+    <title>YouTube Language Learning Tool</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>중국어 학습 도구 - 테스트</h1>
-    
-    <div>
-        <input type="file" id="subtitleFile" accept=".smi">
-        <button id="processButton">자막 처리하기</button>
+    <div class="container">
+        <h1>YouTube Language Learning</h1>
+        
+        <div class="video-container">
+            <div id="player"></div>
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="videoId" placeholder="YouTube Video ID">
+            <button id="loadVideo">Load Video</button>
+        </div>
+        
+        <div class="subtitle-container">
+            <div id="subtitles"></div>
+        </div>
     </div>
-    
-    <div id="subtitles">
-        여기에 처리된 자막이 표시됩니다.
-    </div>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const processButton = document.getElementById('processButton');
-            processButton.addEventListener('click', processSubtitleFile);
-            
-            function processSubtitleFile() {
-                const subtitleFile = document.getElementById('subtitleFile').files[0];
-                if (!subtitleFile) {
-                    alert('자막 파일을 선택해주세요.');
-                    return;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const content = e.target.result;
-                    const subtitles = parseSMI(content);
-                    displaySubtitles(subtitles);
-                };
-                reader.readAsText(subtitleFile);
-            }
-            
-            function parseSMI(content) {
-                // 간단한 파싱 - 예시 자막 반환
-                return [
-                    { text: "这是一个发生在"文化大革命"中的真实故事" },
-                    { text: "这就是那棵有名的英雄树呢" },
-                    { text: "我知道这棵英雄树" }
-                ];
-            }
-            
-            function displaySubtitles(subtitles) {
-                const subtitlesContainer = document.getElementById('subtitles');
-                subtitlesContainer.innerHTML = '';
-                
-                subtitles.forEach(sub => {
-                    // 간단한 괄호 처리 - "的" 단어를 괄호로 처리
-                    const processedText = sub.text.replace(/的/g, '<span class="placeholder">(的)</span>');
-                    
-                    const div = document.createElement('div');
-                    div.className = 'subtitle-line';
-                    div.innerHTML = processedText;
-                    subtitlesContainer.appendChild(div);
-                });
-                
-                // 괄호 클릭 이벤트 추가
-                document.querySelectorAll('.placeholder').forEach(el => {
-                    el.addEventListener('click', function() {
-                        const word = this.textContent.substring(1, this.textContent.length - 1);
-                        this.textContent = word;
-                        this.classList.add('revealed');
-                    });
-                });
-            }
-        });
-    </script>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script src="script.js"></script>
 </body>
 </html>
