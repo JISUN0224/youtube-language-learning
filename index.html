@@ -11,8 +11,10 @@
         <h1>중국어 학습 도구</h1>
         
         <div class="instructions">
-            <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 중국어 자막이 있는 동영상을 사용해주세요.</p>
-            <p>괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
+            <p>1. YouTube 동영상 ID를 입력하세요.</p>
+            <p>2. 자막 파일(.smi, .srt, .vtt)을 업로드하세요.</p>
+            <p>3. "비디오 및 자막 로드" 버튼을 클릭하세요.</p>
+            <p>4. 괄호로 가려진 단어는 클릭하면 원래 단어가 표시됩니다.</p>
         </div>
         
         <div class="video-container">
@@ -21,16 +23,16 @@
         
         <div class="controls">
             <input type="text" id="videoId" placeholder="YouTube 비디오 ID를 입력하세요">
-            <button id="loadVideo">비디오 로드</button>
+            <input type="file" id="subtitleFile" accept=".smi,.srt,.vtt">
+            <button id="loadVideoAndSubtitles">비디오 및 자막 로드</button>
         </div>
         
         <div class="subtitle-container">
             <div id="subtitles">
-                <div class="initial-message">비디오를 로드하면 이곳에 중국어 자막이 표시됩니다.</div>
+                <div class="initial-message">비디오와 자막 파일을 로드하면 이곳에 중국어 자막이 표시됩니다.</div>
             </div>
         </div>
     </div>
-
     <script src="https://www.youtube.com/iframe_api"></script>
     <script src="script.js"></script>
 </body>
