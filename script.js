@@ -1,7 +1,6 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
 
-
-// 시간 문자열("00:01:23,456") → 초(float)로 변환
+// 시간 문자열 "00:01:23,456" → 초(float)로 변환
 function timeStringToSeconds(timeStr) {
     const [hms, ms] = timeStr.split(',');
     const [h, m, s] = hms.split(':').map(Number);
@@ -14,10 +13,12 @@ function onYouTubeIframeAPIReady() {
         width: '640',
         videoId: '',
         events: {
-            'onReady': () => document.getElementById('loadVideo').addEventListener('click', loadVideo),
+            'onReady': () => {
+                document.getElementById('loadVideo').addEventListener('click', loadVideo);
+            },
             'onStateChange': (e) => {
                 if (e.data === YT.PlayerState.PLAYING) {
-                    clearInterval(window.subtitleInterval); // 중복 방지
+                    clearInterval(window.subtitleInterval);
                     window.subtitleInterval = setInterval(updateSubtitleHighlight, 100);
                 } else {
                     clearInterval(window.subtitleInterval);
@@ -40,7 +41,6 @@ async function fetchSubtitles() {
         const res = await fetch('shanzhashuzhilian_cn.json');
         const raw = await res.json();
 
-        // 문자열 시간 → 초로 변환
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
             end: timeStringToSeconds(item.end_time),
@@ -51,25 +51,30 @@ async function fetchSubtitles() {
         displaySubtitles();
     } catch (err) {
         console.error("자막 로드 오류:", err);
-        document.getElementById('subtitles').innerHTML = "<div class='error'>자막 데이터를 불러오는 데 실패했습니다.</div>";
+        document.getElementById('subtitles').innerHTML =
+            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다.</div>";
     }
 }
 
 function processSubtitles() {
+    if (typeof jieba === 'undefined') {
+        console.error("jieba 라이브러리가 로드되지 않았습니다.");
+        return;
+    }
+
     subtitles.forEach(sub => {
         const text = sub.text;
-        const words = jieba.cut(text); // jieba로 단어 분리
+        const words = jieba.cut(text); // 단어 분리
+
         if (!words.length) {
             sub.processedText = text;
             return;
         }
 
-        // 길이 2 이상인 단어 중 무작위 선택
         const candidates = words.filter(w => w.length >= 2);
-        const selectedWord = candidates.length > 0 ? 
-                             candidates[Math.floor(Math.random() * candidates.length)] : null;
+        const selectedWord = candidates.length > 0 ?
+            candidates[Math.floor(Math.random() * candidates.length)] : null;
 
-        // 단어를 괄호로 감싸기
         if (selectedWord) {
             const replaced = words.map(w =>
                 w === selectedWord ? `<span class="placeholder" data-word="${w}">(___)</span>` : w
@@ -80,7 +85,6 @@ function processSubtitles() {
         }
     });
 }
-
 
 function displaySubtitles() {
     const container = document.getElementById('subtitles');
@@ -104,14 +108,17 @@ function displaySubtitles() {
 function updateSubtitleHighlight() {
     if (!player || !subtitles.length) return;
 
-    const currentTime = player.getCurrentTime()+8;
+    const currentTime = player.getCurrentTime() + 8; // 🔧 동기화 보정
 
     subtitles.forEach((sub, index) => {
         const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
-        if (currentTime >= sub.start && currentTime <= sub.end) {
-            el.classList.add('highlight');
-        } else {
-            el.classList.remove('highlight');
+        if (el) {
+            if (currentTime >= sub.start && currentTime <= sub.end) {
+                el.classList.add('highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } else {
+                el.classList.remove('highlight');
+            }
         }
     });
 }
