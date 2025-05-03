@@ -5,16 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>중국어 학습 도구 - YouTube 자막 동기화</title>
   <link rel="stylesheet" href="styles.css">
-
-  <!-- ✅ 브라우저용 jieba 라이브러리 CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/jieba-zh@1.0.6/dist/jieba.min.js"></script>
 </head>
 <body>
   <div class="container">
     <h1>중국어 학습 도구</h1>
     <div class="instructions">
-      <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 자막은 subtitles.json 파일에서 불러옵니다.</p>
-      <p>괄호로 표시된 단어를 클릭하면 정답이 공개됩니다.</p>
+      <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 자막은 JSON 파일에서 불러옵니다.</p>
     </div>
 
     <div class="video-container">
@@ -31,10 +27,9 @@
         <div class="initial-message">비디오를 로드하면 이곳에 자막이 표시됩니다.</div>
       </div>
     </div>
-
   </div>
 
-  <!-- 유튜브 API 및 메인 JS -->
+  <!-- YouTube API & 메인 스크립트 -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="script.js"></script>
 </body>
