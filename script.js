@@ -1,7 +1,5 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
 
-// jieba 사전 로딩
-jieba.load();
 
 // 시간 문자열("00:01:23,456") → 초(float)로 변환
 function timeStringToSeconds(timeStr) {
