@@ -1,89 +1,507 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
+const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 유튜브 ID를 입력하세요
+const DEFAULT_SYNC_OFFSET = 5.5; // 기본 싱크 오프셋 (초 단위)
+let syncOffset = DEFAULT_SYNC_OFFSET;
+let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
 
-// 시간 문자열 "00:01:23,456" → 초(float)로 변환
+// DOM이 로드된 후 실행
+document.addEventListener('DOMContentLoaded', function() {
+    // 단어 발음 버튼 이벤트 리스너
+    document.body.addEventListener('click', function(e) {
+        if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
+            const word = document.getElementById('vocab-title').textContent;
+            if (word) {
+                speakChinese(word);
+            }
+        }
+    });
+    
+    // 예문 발음 버튼 이벤트 리스너
+    document.body.addEventListener('click', function(e) {
+        if (e.target.id === 'example-pronunciation-btn' || e.target.closest('#example-pronunciation-btn')) {
+            const example = document.getElementById('vocab-example-cn').textContent;
+            if (example) {
+                speakChinese(example);
+            }
+        }
+    });
+    
+    // 자막 싱크 조절 버튼 이벤트 리스너
+    document.getElementById('sync-backward').addEventListener('click', function() {
+        syncOffset -= 1;
+        updateSyncStatus(syncOffset);
+    });
+    
+    document.getElementById('sync-forward').addEventListener('click', function() {
+        syncOffset += 1;
+        updateSyncStatus(syncOffset);
+    });
+    
+    // 자막 데이터 자동 로드
+    fetchSubtitles();
+    
+    // 퀴즈 시작 버튼 이벤트 리스너
+    document.body.addEventListener('click', function(e) {
+        if (e.target.id === 'start-quiz-btn' || e.target.closest('#start-quiz-btn')) {
+            const vocabElement = document.querySelector('.vocab.active');
+            if (vocabElement) {
+                const word = vocabElement.dataset.word;
+                startQuiz(word);
+            }
+        }
+    });
+});
+
+// 싱크 상태 업데이트
+function updateSyncStatus(offset) {
+    document.getElementById('sync-status').textContent = `자막 싱크: ${offset}초`;
+}
+
+// 중국어 발음 재생 (Web Speech API 사용)
+function speakChinese(text) {
+    if ('speechSynthesis' in window) {
+        // 음성 합성 객체 생성
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // 중국어(표준어)로 설정
+        utterance.lang = 'zh-CN';
+        
+        // 음성 재생
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.warn('이 브라우저는 음성 합성을 지원하지 않습니다.');
+        alert('이 브라우저는 음성 합성을 지원하지 않습니다. 최신 Chrome, Firefox, Safari, Edge 등의 브라우저를 사용해주세요.');
+    }
+}
+
+// 시간 문자열을 초 단위로 변환
 function timeStringToSeconds(timeStr) {
     const [hms, ms] = timeStr.split(',');
     const [h, m, s] = hms.split(':').map(Number);
     return h * 3600 + m * 60 + s + (parseInt(ms) || 0) / 1000;
 }
 
+// YouTube API 준비 완료 시 호출
 function onYouTubeIframeAPIReady() {
+    console.log("YouTube API 로드됨");
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: '',
+        videoId: fixedVideoId, // 고정 비디오 ID 사용
+        playerVars: {
+            autoplay: 0,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1
+        },
         events: {
-            'onReady': () => {
-                document.getElementById('loadVideo').addEventListener('click', loadVideo);
-            },
-            'onStateChange': (e) => {
-                if (e.data === YT.PlayerState.PLAYING) {
-                    clearInterval(window.subtitleInterval);
-                    window.subtitleInterval = setInterval(updateSubtitleHighlight, 100);
-                } else {
-                    clearInterval(window.subtitleInterval);
-                }
-            }
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
         }
     });
 }
 
-function loadVideo() {
-    const videoId = document.getElementById('videoId').value;
-    if (videoId) {
-        player.loadVideoById(videoId);
-        fetchSubtitles();
+// 플레이어 준비 완료
+function onPlayerReady(event) {
+    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', fixedVideoId);
+}
+
+// 플레이어 상태 변경
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        // 재생 시 자막 하이라이트 업데이트 시작
+        clearInterval(window.subtitleInterval);
+        window.subtitleInterval = setInterval(updateSubtitleHighlight, 100);
+    } else if (event.data === YT.PlayerState.ENDED) {
+        // 반복 재생 중이라면, 다시 재생
+        if (loopingInterval !== null && currentSubtitleIndex >= 0) {
+            playSubtitleSegment(currentSubtitleIndex);
+        }
+    } else {
+        // 일시 정지 시 자막 하이라이트 업데이트 중지
+        clearInterval(window.subtitleInterval);
     }
 }
 
+// 자막 데이터 가져오기
 async function fetchSubtitles() {
     try {
-        const res = await fetch('shanzhashuzhilian_cn.json');
+        // 여기에 자막 파일의 경로를 지정하세요
+        const res = await fetch('vocabulary_subtitles_1.json');
         const raw = await res.json();
-
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
             end: timeStringToSeconds(item.end_time),
-            text: item.text
+            text_cn: item.text_cn || "",
+            text_kr: item.text_kr || "",
+            vocabulary: item.vocabulary || []
         }));
-
         displaySubtitles();
     } catch (err) {
         console.error("자막 로드 오류:", err);
         document.getElementById('subtitles').innerHTML =
-            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다.</div>";
+            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다. 오류: " + err.message + "</div>";
     }
 }
 
+// 자막 화면에 표시
 function displaySubtitles() {
     const container = document.getElementById('subtitles');
     container.innerHTML = '';
+    
     subtitles.forEach((sub, index) => {
         const div = document.createElement('div');
         div.className = 'subtitle-line';
         div.dataset.index = index;
-        div.innerText = sub.text;
+        
+        let cn = sub.text_cn;
+        
+        // 어휘가 있을 경우 블랭크 처리
+        if (sub.vocabulary && sub.vocabulary.length) {
+            sub.vocabulary.forEach(v => {
+                // 단어를 정규식으로 찾아 블랭크로 대체
+                const wordPattern = new RegExp(v.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                // 퀴즈 데이터도 함께 저장
+                const quizData = v.quiz ? JSON.stringify(v.quiz).replace(/"/g, '&quot;') : '';
+                cn = cn.replace(wordPattern, `<span class='vocab' data-word='${v.word}' data-pinyin='${v.pinyin}' data-meaning='${v.meaning}' data-example='${v.example}' data-quiz='${quizData}'>____</span>`);
+            });
+        }
+        
+        // 반복 청취 버튼 추가
+        div.innerHTML = `
+            <div class="cn-text">${cn}</div>
+            <div class="kr-text">${sub.text_kr}</div>
+            <button class="repeat-btn" data-index="${index}">반복</button>
+        `;
+        
         container.appendChild(div);
+    });
+    
+    // 블랭크 클릭 이벤트 추가
+    document.querySelectorAll('.vocab').forEach(el => {
+        el.addEventListener('click', (e) => {
+            // 클릭한 어휘 하이라이트
+            document.querySelectorAll('.vocab').forEach(v => v.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // 어휘 정보 표시
+            const word = e.target.dataset.word;
+            const meaning = e.target.dataset.meaning;
+            const pinyin = e.target.dataset.pinyin;
+            const example = e.target.dataset.example;
+            const quizData = e.target.dataset.quiz;
+            
+            displayVocabDetail(word, pinyin, meaning, example, quizData);
+        });
+    });
+    
+    // 반복 재생 버튼 이벤트 추가
+    document.querySelectorAll('.repeat-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            startRepeatPlayback(index);
+        });
     });
 }
 
-function updateSubtitleHighlight() {
-  if (!player || !subtitles.length) return;
-
-  const currentTime = player.getCurrentTime() + 5; // 동기화 보정
-
-  subtitles.forEach((sub, index) => {
-    const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
-    const nextStart = subtitles[index + 1]?.start ?? Infinity;
-
-    if (!el) return;
-
-    if (currentTime >= sub.start && currentTime < nextStart) {
-      el.classList.add('highlight');
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+// 어휘 정보 표시
+function displayVocabDetail(word, pinyin, meaning, example, quizData) {
+    document.getElementById('no-vocab-message').style.display = 'none';
+    document.getElementById('vocab-content').style.display = 'block';
+    
+    document.getElementById('vocab-title').textContent = word;
+    document.getElementById('vocab-pinyin').textContent = pinyin;
+    document.getElementById('vocab-meaning').textContent = meaning;
+    
+    // 예문 분리 (중국어/한국어)
+    const exampleParts = example.split('(');
+    if (exampleParts.length > 1) {
+        document.getElementById('vocab-example-cn').textContent = exampleParts[0].trim();
+        document.getElementById('vocab-example-kr').textContent = '(' + exampleParts[1];
     } else {
-      el.classList.remove('highlight');
+        document.getElementById('vocab-example-cn').textContent = example;
+        document.getElementById('vocab-example-kr').textContent = '';
     }
-  });
+    
+    // 퀴즈 정보 처리
+    const quizContainer = document.getElementById('vocab-quiz-container');
+    if (quizData && quizData !== 'undefined') {
+        try {
+            const quiz = JSON.parse(quizData.replace(/&quot;/g, '"'));
+            // 퀴즈 버튼 표시
+            quizContainer.innerHTML = `
+                <div class="quiz-info">
+                    <h4>어휘 배열 퀴즈가 있습니다</h4>
+                    <button id="start-quiz-btn">퀴즈 시작</button>
+                </div>
+            `;
+            quizContainer.style.display = 'block';
+        } catch (e) {
+            console.error('퀴즈 데이터 파싱 오류:', e);
+            quizContainer.style.display = 'none';
+        }
+    } else {
+        quizContainer.style.display = 'none';
+    }
 }
 
+// 현재 자막 하이라이트 업데이트
+function updateSubtitleHighlight() {
+    if (!player || !subtitles.length) return;
+    
+    // 현재 재생 시간에 싱크 오프셋 적용
+    const currentTime = player.getCurrentTime() + syncOffset;
+    
+    let activeSubtitleFound = false;
+    
+    subtitles.forEach((sub, index) => {
+        const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
+        if (!el) return;
+        
+        // 현재 자막의 시작과 끝 시간 확인
+        if (currentTime >= sub.start && currentTime <= sub.end) {
+            // 현재 재생 중인 자막 하이라이트
+            if (!el.classList.contains('highlight')) {
+                el.classList.add('highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                currentSubtitleIndex = index;
+            }
+            activeSubtitleFound = true;
+        } else if (index !== currentSubtitleIndex) {
+            // 현재 활성화된 자막이 아니면 하이라이트 제거
+            el.classList.remove('highlight');
+        }
+    });
+    
+    // 만약 활성화된 자막이 없고, 현재 시간이 다음 자막의 시작 시간보다 작으면
+    // 현재 활성화된 자막의 하이라이트 유지
+    if (!activeSubtitleFound && currentSubtitleIndex >= 0) {
+        const nextSubIndex = currentSubtitleIndex + 1;
+        
+        // 다음 자막이 있고, 현재 시간이 다음 자막의 시작 시간보다 작으면 하이라이트 유지
+        if (nextSubIndex < subtitles.length && currentTime < subtitles[nextSubIndex].start) {
+            // 하이라이트 유지 (아무 작업 안 함)
+        } else {
+            // 그렇지 않으면 하이라이트 제거
+            const currentEl = document.querySelector(`.subtitle-line[data-index='${currentSubtitleIndex}']`);
+            if (currentEl) {
+                currentEl.classList.remove('highlight');
+            }
+            currentSubtitleIndex = -1;
+        }
+    }
+}
+
+// 어휘 배열 퀴즈 시작
+function startQuiz(word) {
+    // 클릭한 어휘의 퀴즈 데이터 가져오기
+    const vocabElement = document.querySelector(`.vocab.active`);
+    if (!vocabElement) return;
+    
+    const quizDataStr = vocabElement.dataset.quiz;
+    if (!quizDataStr) {
+        console.error('퀴즈 데이터가 없습니다.');
+        return;
+    }
+    
+    try {
+        const quizData = JSON.parse(quizDataStr.replace(/&quot;/g, '"'));
+        
+        // 퀴즈 UI 생성
+        const quizContainer = document.getElementById('vocab-quiz-container');
+        quizContainer.innerHTML = `
+            <div class="quiz-content">
+                <h3>어휘 배열 퀴즈</h3>
+                <p>다음 문장의 단어를 올바른 순서로 배열하세요:</p>
+                <div class="quiz-sentence">${quizData.text_cn}</div>
+                <div class="tokens-container"></div>
+                <div class="answer-container"></div>
+                <div class="quiz-buttons">
+                    <button id="check-answer-btn">정답 확인</button>
+                    <button id="reset-quiz-btn">다시 시작</button>
+                </div>
+                <div class="quiz-result"></div>
+            </div>
+        `;
+        
+        // 토큰(단어) 버튼 생성
+        const tokensContainer = quizContainer.querySelector('.tokens-container');
+        const shuffledTokens = [...quizData.tokens].sort(() => Math.random() - 0.5);
+        
+        shuffledTokens.forEach(token => {
+            const tokenBtn = document.createElement('button');
+            tokenBtn.className = 'token-btn';
+            tokenBtn.textContent = token;
+            tokenBtn.addEventListener('click', () => {
+                // 이미 선택된 토큰은 다시 선택 불가
+                if (tokenBtn.classList.contains('selected')) return;
+                
+                // 토큰 선택 처리
+                tokenBtn.classList.add('selected');
+                
+                // 답변 영역에 토큰 추가
+                const answerContainer = quizContainer.querySelector('.answer-container');
+                const answerToken = document.createElement('span');
+                answerToken.className = 'answer-token';
+                answerToken.textContent = token;
+                answerToken.dataset.original = token;
+                
+                // 토큰 클릭 시 제거 기능
+                answerToken.addEventListener('click', () => {
+                    // 답변에서 토큰 제거
+                    answerToken.remove();
+                    
+                    // 토큰 버튼 다시 활성화
+                    const tokenBtns = tokensContainer.querySelectorAll('.token-btn');
+                    for (let btn of tokenBtns) {
+                        if (btn.textContent === token && btn.classList.contains('selected')) {
+                            btn.classList.remove('selected');
+                            break;
+                        }
+                    }
+                });
+                
+                answerContainer.appendChild(answerToken);
+            });
+            tokensContainer.appendChild(tokenBtn);
+        });
+        
+        // 정답 확인 버튼 이벤트
+        quizContainer.querySelector('#check-answer-btn').addEventListener('click', () => {
+            const answerTokens = quizContainer.querySelectorAll('.answer-token');
+            const userAnswer = Array.from(answerTokens).map(token => token.dataset.original);
+            
+            const resultElement = quizContainer.querySelector('.quiz-result');
+            
+            // 정답 비교
+            let isCorrect = true;
+            if (userAnswer.length !== quizData.tokens.length) {
+                isCorrect = false;
+            } else {
+                for (let i = 0; i < userAnswer.length; i++) {
+                    if (userAnswer[i] !== quizData.tokens[i]) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (isCorrect) {
+                resultElement.innerHTML = `
+                    <div class="correct">정답입니다! 👏</div>
+                    <div class="correct-sentence">${quizData.text_cn}</div>
+                `;
+                // 문장 발음 버튼 추가
+                const pronunciationBtn = document.createElement('button');
+                pronunciationBtn.className = 'pronunciation-btn';
+                pronunciationBtn.textContent = '문장 발음 듣기';
+                pronunciationBtn.addEventListener('click', () => {
+                    speakChinese(quizData.text_cn);
+                });
+                resultElement.appendChild(pronunciationBtn);
+            } else {
+                resultElement.innerHTML = `
+                    <div class="incorrect">틀렸습니다. 다시 시도해보세요.</div>
+                `;
+            }
+        });
+        
+        // 퀴즈 리셋 버튼 이벤트
+        quizContainer.querySelector('#reset-quiz-btn').addEventListener('click', () => {
+            // 토큰 버튼 초기화
+            const tokenBtns = tokensContainer.querySelectorAll('.token-btn');
+            tokenBtns.forEach(btn => btn.classList.remove('selected'));
+            
+            // 답변 영역 초기화
+            quizContainer.querySelector('.answer-container').innerHTML = '';
+            
+            // 결과 초기화
+            quizContainer.querySelector('.quiz-result').innerHTML = '';
+        });
+        
+    } catch (e) {
+        console.error('퀴즈 시작 오류:', e);
+        alert('퀴즈를 시작하는 중 오류가 발생했습니다.');
+    }
+}
+
+// 특정 자막 세그먼트 재생
+function playSubtitleSegment(index) {
+    if (!player || index < 0 || index >= subtitles.length) return;
+    
+    const subtitle = subtitles[index];
+    // 싱크 오프셋 적용하여 시작 시간 계산
+    const startTime = Math.max(0, subtitle.start - syncOffset);
+    
+    // 비디오 해당 위치로 이동하고 재생
+    player.seekTo(startTime, true);
+    player.playVideo();
+}
+
+// 반복 재생 시작
+function startRepeatPlayback(index) {
+    // 기존 반복 재생 중지
+    stopRepeatPlayback();
+    
+    if (!player || index < 0 || index >= subtitles.length) return;
+    
+    const subtitle = subtitles[index];
+    // 싱크 오프셋 적용하여 시작/종료 시간 계산
+    const startTime = Math.max(0, subtitle.start - syncOffset);
+    const endTime = subtitle.end - syncOffset;
+    const duration = endTime - startTime;
+    
+    // 해당 세그먼트 재생 시작
+    playSubtitleSegment(index);
+    
+    // 반복 재생을 위한 인터벌 설정
+    loopingInterval = setInterval(() => {
+        const currentTime = player.getCurrentTime();
+        // 종료 시간을 지났으면 다시 시작 지점으로 이동
+        if (currentTime >= endTime) {
+            playSubtitleSegment(index);
+        }
+    }, 500); // 500ms마다 체크
+    
+    // 반복 버튼 활성화 표시
+    document.querySelectorAll('.repeat-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.querySelector(`.repeat-btn[data-index="${index}"]`).classList.add('active');
+    
+    // 화면에 반복 모드 알림
+    const notification = document.createElement('div');
+    notification.className = 'repeat-notification';
+    notification.textContent = `라인 ${index + 1} 반복 재생 중`;
+    notification.innerHTML += `<button id="stop-repeat-btn">중지</button>`;
+    
+    // 기존 알림 제거
+    const existingNotification = document.querySelector('.repeat-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    document.body.appendChild(notification);
+    
+    // 중지 버튼 이벤트
+    document.getElementById('stop-repeat-btn').addEventListener('click', stopRepeatPlayback);
+}
+
+// 반복 재생 중지
+function stopRepeatPlayback() {
+    if (loopingInterval !== null) {
+        clearInterval(loopingInterval);
+        loopingInterval = null;
+        
+        // 반복 버튼 비활성화
+        document.querySelectorAll('.repeat-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // 알림 제거
+        const notification = document.querySelector('.repeat-notification');
+        if (notification) {
+            notification.remove();
+        }
+    }
+}
