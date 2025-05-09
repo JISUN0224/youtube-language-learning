@@ -1,6 +1,6 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
 const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 유튜브 ID를 입력하세요
-const DEFAULT_SYNC_OFFSET = 5.5; // 기본 싱크 오프셋 (초 단위)
+const DEFAULT_SYNC_OFFSET = 4.5; // 기본 싱크 오프셋 (초 단위)
 let syncOffset = DEFAULT_SYNC_OFFSET;
 let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
 
@@ -46,16 +46,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // 자막 데이터 자동 로드
     fetchSubtitles();
     
-    // 퀴즈 시작 버튼 이벤트 리스너
-    document.body.addEventListener('click', function(e) {
-        if (e.target.id === 'start-quiz-btn' || e.target.closest('#start-quiz-btn')) {
-            const vocabElement = document.querySelector('.vocab.active');
-            if (vocabElement) {
-                const word = vocabElement.dataset.word;
-                startQuiz(word);
-            }
+    // 방문한 어휘 스타일 추가
+    const style = document.createElement('style');
+    style.textContent = `
+        .vocab.visited {
+            background-color: #e0f7fa;
+            color: #0097a7;
+            border: 1px dashed #00838f;
         }
-    });
+        
+        .vocab.active.visited {
+            background-color: #80deea;
+            color: #006064;
+            border: 1px solid #00838f;
+        }
+    `;
+    document.head.appendChild(style);
 });
 
 // 싱크 상태 업데이트
@@ -198,14 +204,37 @@ function displaySubtitles() {
             const quizData = e.target.dataset.quiz;
             
             displayVocabDetail(word, pinyin, meaning, example, quizData);
+            
+            // 퀴즈 데이터가 있으면 바로 퀴즈 시작 (3번 요구사항)
+            if (quizData && quizData !== 'undefined') {
+                startQuiz(word);
+            }
+            
+            // 클릭한 어휘 색상 변경 (4번 요구사항)
+            e.target.classList.add('visited');
         });
     });
     
-    // 반복 재생 버튼 이벤트 추가
+    // 반복 재생 버튼 이벤트 추가 - 토글 기능 (2번 요구사항)
     document.querySelectorAll('.repeat-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index);
-            startRepeatPlayback(index);
+            
+            // 이미 활성화된 버튼이면 반복 중지
+            if (btn.classList.contains('active')) {
+                stopRepeatPlayback();
+                btn.textContent = '반복'; // 버튼 텍스트 원래대로
+            } else {
+                // 반복 시작
+                startRepeatPlayback(index);
+                
+                // 다른 모든 버튼의 텍스트는 '반복'으로
+                document.querySelectorAll('.repeat-btn').forEach(otherBtn => {
+                    if (otherBtn !== btn) {
+                        otherBtn.textContent = '반복';
+                    }
+                });
+            }
         });
     });
 }
@@ -229,26 +258,8 @@ function displayVocabDetail(word, pinyin, meaning, example, quizData) {
         document.getElementById('vocab-example-kr').textContent = '';
     }
     
-    // 퀴즈 정보 처리
-    const quizContainer = document.getElementById('vocab-quiz-container');
-    if (quizData && quizData !== 'undefined') {
-        try {
-            const quiz = JSON.parse(quizData.replace(/&quot;/g, '"'));
-            // 퀴즈 버튼 표시
-            quizContainer.innerHTML = `
-                <div class="quiz-info">
-                    <h4>어휘 배열 퀴즈가 있습니다</h4>
-                    <button id="start-quiz-btn">퀴즈 시작</button>
-                </div>
-            `;
-            quizContainer.style.display = 'block';
-        } catch (e) {
-            console.error('퀴즈 데이터 파싱 오류:', e);
-            quizContainer.style.display = 'none';
-        }
-    } else {
-        quizContainer.style.display = 'none';
-    }
+    // 퀴즈 정보 처리 - 퀴즈 버튼 숨기기 (자동 시작으로 변경)
+    document.getElementById('vocab-quiz-container').style.display = 'none';
 }
 
 // 현재 자막 하이라이트 업데이트
@@ -299,7 +310,6 @@ function updateSubtitleHighlight() {
 }
 
 // 어휘 배열 퀴즈 시작
-// 어휘 배열 퀴즈 시작
 function startQuiz(word) {
     // 클릭한 어휘의 퀴즈 데이터 가져오기
     const vocabElement = document.querySelector(`.vocab.active`);
@@ -329,6 +339,7 @@ function startQuiz(word) {
                 <div class="quiz-result"></div>
             </div>
         `;
+        quizContainer.style.display = 'block';
         
         // 토큰(단어) 버튼 생성
         const tokensContainer = quizContainer.querySelector('.tokens-container');
@@ -452,45 +463,40 @@ function startRepeatPlayback(index) {
     if (!player || index < 0 || index >= subtitles.length) return;
     
     const subtitle = subtitles[index];
+    
     // 싱크 오프셋 적용하여 시작/종료 시간 계산
     const startTime = Math.max(0, subtitle.start - syncOffset);
     const endTime = subtitle.end - syncOffset;
-    const duration = endTime - startTime;
+    
+    // 구간이 너무 짧으면 최소 재생 시간 보장 (최소 3초)
+    const minDuration = 3;
+    const actualEndTime = (endTime - startTime < minDuration) ? startTime + minDuration : endTime;
+    
+    console.log(`반복 재생 설정: 시작=${startTime.toFixed(2)}초, 종료=${actualEndTime.toFixed(2)}초, 구간=${(actualEndTime-startTime).toFixed(2)}초`);
     
     // 해당 세그먼트 재생 시작
-    playSubtitleSegment(index);
+    player.seekTo(startTime, true);
+    player.playVideo();
     
     // 반복 재생을 위한 인터벌 설정
     loopingInterval = setInterval(() => {
         const currentTime = player.getCurrentTime();
-        // 종료 시간을 지났으면 다시 시작 지점으로 이동
-        if (currentTime >= endTime) {
-            playSubtitleSegment(index);
+        // 현재 시간이 종료 시간을 지났거나 가까우면 다시 시작 지점으로 이동
+        if (currentTime >= actualEndTime - 0.3) {
+            player.seekTo(startTime, true);
         }
-    }, 500); // 500ms마다 체크
+    }, 200); // 더 자주 체크 (200ms마다)
     
     // 반복 버튼 활성화 표시
     document.querySelectorAll('.repeat-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    document.querySelector(`.repeat-btn[data-index="${index}"]`).classList.add('active');
+    const activeBtn = document.querySelector(`.repeat-btn[data-index="${index}"]`);
+    activeBtn.classList.add('active');
+    activeBtn.textContent = '중지'; // 버튼 텍스트 변경
     
-    // 화면에 반복 모드 알림
-    const notification = document.createElement('div');
-    notification.className = 'repeat-notification';
-    notification.textContent = `라인 ${index + 1} 반복 재생 중`;
-    notification.innerHTML += `<button id="stop-repeat-btn">중지</button>`;
-    
-    // 기존 알림 제거
-    const existingNotification = document.querySelector('.repeat-notification');
-    if (existingNotification) {
-        existingNotification.remove();
-    }
-    
-    document.body.appendChild(notification);
-    
-    // 중지 버튼 이벤트
-    document.getElementById('stop-repeat-btn').addEventListener('click', stopRepeatPlayback);
+    // 현재 반복 중인 인덱스 저장
+    currentSubtitleIndex = index;
 }
 
 // 반복 재생 중지
@@ -499,15 +505,10 @@ function stopRepeatPlayback() {
         clearInterval(loopingInterval);
         loopingInterval = null;
         
-        // 반복 버튼 비활성화
+        // 반복 버튼 비활성화 및 텍스트 원래대로
         document.querySelectorAll('.repeat-btn').forEach(btn => {
             btn.classList.remove('active');
+            btn.textContent = '반복';
         });
-        
-        // 알림 제거
-        const notification = document.querySelector('.repeat-notification');
-        if (notification) {
-            notification.remove();
-        }
     }
 }
