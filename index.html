@@ -3,33 +3,404 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>중국어 학습 도구 - YouTube 자막 동기화</title>
+  <title>중국어 학습 도구</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    .usage-guide {
+      background-color: #f8f9fa;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      border-left: 5px solid #4285f4;
+    }
+    
+    .usage-guide h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .usage-guide ul {
+      margin-bottom: 0;
+      padding-left: 20px;
+    }
+    
+    .usage-guide li {
+      margin-bottom: 8px;
+    }
+    
+    .sync-controls-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 10px 0;
+      padding: 8px;
+      background-color: #f0f0f0;
+      border-radius: 5px;
+    }
+    
+    .sync-controls-container button {
+      padding: 5px 10px;
+      margin: 0 10px;
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .sync-controls-container button:hover {
+      background-color: #3367d6;
+    }
+    
+    #sync-status {
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .example-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    
+    #example-pronunciation-btn {
+      font-size: 0.85em;
+      padding: 3px 8px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    
+    #example-pronunciation-btn:hover {
+      background-color: #45a049;
+    }
+    
+    .subtitle-line {
+      position: relative;
+      padding: 8px 10px;
+      margin-bottom: 5px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    
+    .subtitle-line.highlight {
+      background-color: #fffde7;
+      border-left: 3px solid #ffc107;
+    }
+    
+    .repeat-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 4px 8px;
+      background-color: #673ab7;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8em;
+    }
+    
+    .repeat-btn:hover {
+      background-color: #5e35b1;
+    }
+    
+    .repeat-btn.active {
+      background-color: #ff5722;
+    }
+    
+    .vocab {
+      display: inline-block;
+      background-color: #e3f2fd;
+      padding: 2px 5px;
+      margin: 0 3px;
+      border-radius: 3px;
+      cursor: pointer;
+      border-bottom: 2px dashed #2196f3;
+    }
+    
+    .vocab.active {
+      background-color: #bbdefb;
+      border-bottom: 2px solid #1976d2;
+    }
+    
+    #vocab-quiz-container {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .quiz-info {
+      text-align: center;
+    }
+    
+    .quiz-info h4 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    #start-quiz-btn {
+      padding: 8px 16px;
+      background-color: #ff9800;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #start-quiz-btn:hover {
+      background-color: #f57c00;
+    }
+    
+    .quiz-content {
+      margin-top: 10px;
+    }
+    
+    .quiz-sentence {
+      font-size: 1.1em;
+      margin: 15px 0;
+      padding: 10px;
+      background-color: #fff3e0;
+      border-radius: 5px;
+      border-left: 3px solid #ff9800;
+    }
+    
+    .tokens-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .token-btn {
+      padding: 8px 12px;
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .token-btn:hover {
+      background-color: #bdbdbd;
+    }
+    
+    .token-btn.selected {
+      background-color: #bdbdbd;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    
+    .answer-container {
+      min-height: 50px;
+      padding: 10px;
+      background-color: #f5f5f5;
+      border: 2px dashed #9e9e9e;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .answer-token {
+      display: inline-block;
+      padding: 6px 10px;
+      background-color: #81c784;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .answer-token:hover {
+      background-color: #66bb6a;
+    }
+    
+    .quiz-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    #check-answer-btn, #reset-quiz-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #check-answer-btn {
+      background-color: #4caf50;
+      color: white;
+    }
+    
+    #check-answer-btn:hover {
+      background-color: #43a047;
+    }
+    
+    #reset-quiz-btn {
+      background-color: #f44336;
+      color: white;
+    }
+    
+    #reset-quiz-btn:hover {
+      background-color: #e53935;
+    }
+    
+    .quiz-result {
+      margin-top: 20px;
+      padding: 10px;
+    }
+    
+    .correct {
+      color: #43a047;
+      font-weight: bold;
+      font-size: 1.1em;
+      text-align: center;
+    }
+    
+    .incorrect {
+      color: #e53935;
+      font-weight: bold;
+      font-size: 1.1em;
+      text-align: center;
+    }
+    
+    .correct-sentence {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #e8f5e9;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+    
+    .pronunciation-btn {
+      padding: 6px 12px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+      display: block;
+      margin: 10px auto;
+    }
+    
+    .repeat-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 10px 15px;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    #stop-repeat-btn {
+      margin-left: 10px;
+      padding: 4px 8px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>중국어 학습 도구</h1>
-    <div class="instructions">
-      <p>YouTube 동영상 ID를 입력하고 "비디오 로드" 버튼을 클릭하세요. 자막은 JSON 파일에서 불러옵니다.</p>
+    
+    <!-- 사용 방법 안내 -->
+    <div class="usage-guide">
+      <h3>사용 방법</h3>
+      <ul>
+        <li>영상의 <strong>재생 버튼</strong>을 누르면 시작됩니다.</li>
+        <li>스크립트의 <strong>빈칸(____)</strong>을 누르면 오른쪽에 어휘의 상세 정보 및 퀴즈가 제공됩니다.</li>
+        <li>자막 싱크가 맞지 않을 경우 <strong>+1초/-1초 버튼</strong>으로 조정 가능합니다.</li>
+        <li>특정 문장을 반복해서 들으려면 문장 옆의 <strong>반복 버튼</strong>을 누르세요.</li>
+      </ul>
     </div>
-
-    <div class="video-container">
-      <div id="player"></div>
+    
+    <!-- 자막 싱크 조절 -->
+    <div class="sync-controls">
+      <div class="sync-controls-container">
+        <button id="sync-backward">◀ -1초</button>
+        <span id="sync-status">자막 싱크: 5.5초</span>
+        <button id="sync-forward">+1초 ▶</button>
+      </div>
     </div>
-
-    <div class="controls">
-      <input type="text" id="videoId" placeholder="YouTube 비디오 ID 입력">
-      <button id="loadVideo">비디오 로드</button>
-    </div>
-
-    <div class="subtitle-container">
-      <div id="subtitles">
-        <div class="initial-message">비디오를 로드하면 이곳에 자막이 표시됩니다.</div>
+    
+    <!-- 메인 콘텐츠 영역 -->
+    <div class="main-content">
+      <div class="left-panel">
+        <div class="video-container">
+          <div id="player"></div>
+        </div>
+        <div class="subtitle-container">
+          <div id="subtitles">
+            <div class="initial-message">비디오를 로드하면 이곳에 자막이 표시됩니다.</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 어휘 정보 패널 -->
+      <div class="right-panel">
+        <div class="vocab-detail-container" id="vocab-detail">
+          <div class="no-vocab-selected" id="no-vocab-message">
+            <p>왼쪽의 블랭크를 클릭하면<br>어휘 정보가 여기에 표시됩니다.</p>
+          </div>
+          
+          <div id="vocab-content" style="display: none;">
+            <div class="vocab-header">
+              <h2 class="vocab-title" id="vocab-title">단어</h2>
+              <button class="pronunciation-btn" id="pronunciation-btn">발음 듣기</button>
+            </div>
+            
+            <div class="vocab-content">
+              <div class="pinyin" id="vocab-pinyin">pinyin</div>
+              <div class="meaning" id="vocab-meaning">의미</div>
+              <div class="example">
+                <div class="example-header">
+                  <span>예문</span>
+                  <button class="pronunciation-btn" id="example-pronunciation-btn">예문 발음 듣기</button>
+                </div>
+                <div class="example-cn" id="vocab-example-cn">예문 (중국어)</div>
+                <div class="example-kr" id="vocab-example-kr">예문 (한국어)</div>
+              </div>
+              
+              <!-- 어휘배열 퀴즈 컨테이너 추가 -->
+              <div id="vocab-quiz-container" style="display: none;">
+                <!-- 퀴즈 시작 전 정보 -->
+                <div class="quiz-info">
+                  <h4>어휘 배열 퀴즈가 있습니다</h4>
+                  <button id="start-quiz-btn">퀴즈 시작</button>
+                </div>
+                
+                <!-- 퀴즈 내용은 JavaScript에서 동적으로 생성됨 -->
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- YouTube API & 메인 스크립트 -->
+  <!-- 스크립트 로드 -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <script src="script.js"></script>
 </body>
