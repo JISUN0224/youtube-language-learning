@@ -139,7 +139,7 @@ function onPlayerStateChange(event) {
 async function fetchSubtitles() {
     try {
         // 여기에 자막 파일의 경로를 지정하세요
-        const res = await fetch('sink_reorder_721_3.json');
+        const res = await fetch('sink_reorder_848.json');
         const raw = await res.json();
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
