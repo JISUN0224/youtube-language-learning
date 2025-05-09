@@ -299,6 +299,7 @@ function updateSubtitleHighlight() {
 }
 
 // 어휘 배열 퀴즈 시작
+// 어휘 배열 퀴즈 시작
 function startQuiz(word) {
     // 클릭한 어휘의 퀴즈 데이터 가져오기
     const vocabElement = document.querySelector(`.vocab.active`);
@@ -313,13 +314,12 @@ function startQuiz(word) {
     try {
         const quizData = JSON.parse(quizDataStr.replace(/&quot;/g, '"'));
         
-        // 퀴즈 UI 생성
+        // 퀴즈 UI 생성 - 전체 문장은 표시하지 않음
         const quizContainer = document.getElementById('vocab-quiz-container');
         quizContainer.innerHTML = `
             <div class="quiz-content">
                 <h3>어휘 배열 퀴즈</h3>
-                <p>다음 문장의 단어를 올바른 순서로 배열하세요:</p>
-                <div class="quiz-sentence">${quizData.text_cn}</div>
+                <p>다음 단어들을 올바른 순서로 배열하세요:</p>
                 <div class="tokens-container"></div>
                 <div class="answer-container"></div>
                 <div class="quiz-buttons">
