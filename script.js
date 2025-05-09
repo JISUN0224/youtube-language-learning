@@ -6,6 +6,12 @@ let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
 
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
+    // YouTube API 스크립트 로드
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
     // 단어 발음 버튼 이벤트 리스너
     document.body.addEventListener('click', function(e) {
         if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
@@ -87,7 +93,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: K9LGQu3QnpU, // 고정 비디오 ID 사용
+        videoId: fixedVideoId, // 고정 비디오 ID 사용
         playerVars: {
             autoplay: 0,
             controls: 1,
@@ -103,7 +109,7 @@ function onYouTubeIframeAPIReady() {
 
 // 플레이어 준비 완료
 function onPlayerReady(event) {
-    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', K9LGQu3QnpU);
+    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', fixedVideoId);
 }
 
 // 플레이어 상태 변경
