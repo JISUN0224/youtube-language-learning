@@ -1,6 +1,6 @@
 let player, subtitles = [], currentSubtitleIndex = -1;
 const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 유튜브 ID를 입력하세요
-const DEFAULT_SYNC_OFFSET = 4.5; // 기본 싱크 오프셋 (초 단위)
+const DEFAULT_SYNC_OFFSET = 4.7; // 기본 싱크 오프셋 (초 단위)
 let syncOffset = DEFAULT_SYNC_OFFSET;
 let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
 
