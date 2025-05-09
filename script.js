@@ -87,7 +87,7 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('player', {
         height: '390',
         width: '640',
-        videoId: fixedVideoId, // 고정 비디오 ID 사용
+        videoId: K9LGQu3QnpU, // 고정 비디오 ID 사용
         playerVars: {
             autoplay: 0,
             controls: 1,
@@ -103,7 +103,7 @@ function onYouTubeIframeAPIReady() {
 
 // 플레이어 준비 완료
 function onPlayerReady(event) {
-    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', fixedVideoId);
+    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', K9LGQu3QnpU);
 }
 
 // 플레이어 상태 변경
@@ -127,7 +127,7 @@ function onPlayerStateChange(event) {
 async function fetchSubtitles() {
     try {
         // 여기에 자막 파일의 경로를 지정하세요
-        const res = await fetch('vocabulary_subtitles_1.json');
+        const res = await fetch('merged_vocabulary_with_quizzes.json');
         const raw = await res.json();
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
