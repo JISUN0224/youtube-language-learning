@@ -139,7 +139,7 @@ function onPlayerStateChange(event) {
 async function fetchSubtitles() {
     try {
         // 여기에 자막 파일의 경로를 지정하세요
-        const res = await fetch('shanzhashuzhilian_cnkr_converted.json');
+        const res = await fetch('shanzhashuzhilian_cnkr_converted');
         const raw = await res.json();
         subtitles = raw.map(item => ({
             start: timeStringToSeconds(item.start_time),
