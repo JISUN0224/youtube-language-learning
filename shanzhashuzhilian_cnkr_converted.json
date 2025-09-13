@@ -42,16 +42,49 @@
     "text_kr": "짐 잘 챙기거라",
     "vocabulary": [
       {
-        "word": "把",
-        "meaning": "~을/를 (목적어를 앞으로 가져오는 조사)",
-        "pinyin": "bǎ",
-        "example": "把书放在桌子上。(책을 책상 위에 놓다.)"
+        "word": "行李",
+        "meaning": "짐, 수하물",
+        "pinyin": "xíng li",
+        "example": "请帮我拿一下行李。(제 짐 좀 들어주세요.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我们的行李已经准备好了，可以出发了。",
+          "tokens": [
+            "我们",
+            "的",
+            "行李",
+            "已经",
+            "准备好",
+            "了",
+            "，",
+            "可以",
+            "出发",
+            "了"
+          ]
+        }
       },
       {
         "word": "带好",
         "meaning": "잘 가지고 다니다, 잘 챙기다",
         "pinyin": "dài hǎo",
-        "example": "出门前要把钥匙带好。(외출하기 전에 열쇠를 잘 챙겨야 한다.)"
+        "example": "出门前要把钥匙带好。(외출하기 전에 열쇠를 잘 챙겨야 한다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "天气很冷，记得带好你的帽子和手套。",
+          "tokens": [
+            "天气",
+            "很",
+            "冷",
+            "，",
+            "记得",
+            "带好",
+            "你",
+            "的",
+            "帽子",
+            "和",
+            "手套"
+          ]
+        }
       }
     ]
   },
@@ -113,15 +146,24 @@
     "vocabulary": [
       {
         "word": "到齐",
-        "meaning": "모두 모이다, 다 도착하다",
+        "meaning": "모두 모이다, 전원 도착하다",
         "pinyin": "dào qí",
-        "example": "人都到齐了，可以开始了。(사람들이 다 모였으니 시작할 수 있다.)"
-      },
-      {
-        "word": "就",
-        "meaning": "~하면, ~하자마자",
-        "pinyin": "jiù",
-        "example": "吃完饭就睡觉。(밥 먹고 나서 바로 잔다.)"
+        "example": "学生们都到齐了，我们可以开始活动了。(학생들이 모두 모였으니, 우리는 활동을 시작할 수 있습니다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "人都到齐了，会议可以开始了。",
+          "tokens": [
+            "人",
+            "都",
+            "到齐",
+            "了",
+            "，",
+            "会议",
+            "可以",
+            "开始",
+            "了"
+          ]
+        }
       }
     ]
   },
@@ -162,15 +204,39 @@
     "vocabulary": [
       {
         "word": "之所以",
-        "meaning": "~하는 까닭이, ~하는 이유가",
+        "meaning": "~인 이유는, ~하게 된 까닭은",
         "pinyin": "zhī suǒ yǐ",
-        "example": "他之所以成功，是因为他非常努力。(그가 성공한 까닭은 매우 열심히 노력했기 때문이다.)"
+        "example": "他之所以迟到是因为堵车。(그가 늦은 이유는 교통 체증 때문이다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我之所以迟到是因为路上塞车了。",
+          "tokens": [
+            "我",
+            "之所以",
+            "迟到",
+            "是",
+            "因为",
+            "路上",
+            "塞车",
+            "了"
+          ]
+        }
       },
       {
         "word": "被称为",
-        "meaning": "~로 불리다, ~라고 칭하다",
+        "meaning": "~로 불리다, ~라고 일컬어지다",
         "pinyin": "bèi chēng wéi",
-        "example": "北京被称为中国的首都。(베이징은 중국의 수도로 불린다.)"
+        "example": "他被称为画坛奇才。(그는 화단의 기재라고 불린다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "这个地方被称为艺术之都。",
+          "tokens": [
+            "这个",
+            "地方",
+            "被称为",
+            "艺术之都"
+          ]
+        }
       }
     ]
   },
@@ -182,10 +248,40 @@
     "text_kr": "험난했던 항일전쟁 시대에 이 나무는",
     "vocabulary": [
       {
-        "word": "是因为",
-        "meaning": "~이기 때문이다, ~하기 때문이다",
-        "pinyin": "shì yīn wèi",
-        "example": "他迟到的原因是因为堵车。(그가 늦은 이유는 교통체증 때문이다.)"
+        "word": "抗日战争",
+        "meaning": "항일전쟁",
+        "pinyin": "kàng rì zhàn zhēng",
+        "example": "抗日战争是中国人民反抗日本侵略的伟大斗争。(항일전쟁은 중국 인민이 일본 침략에 저항한 위대한 투쟁이다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我们学习抗日战争的历史。",
+          "tokens": [
+            "我们",
+            "学习",
+            "抗日战争",
+            "的",
+            "历史"
+          ]
+        }
+      },
+      {
+        "word": "年代",
+        "meaning": "시대, 연대",
+        "pinyin": "nián dài",
+        "example": "那是一个艰苦的年代。(그것은 어려운 시대였다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "那个年代的电影风格很独特。",
+          "tokens": [
+            "那个",
+            "年代",
+            "的",
+            "电影",
+            "风格",
+            "很",
+            "独特"
+          ]
+        }
       }
     ]
   },
@@ -247,9 +343,24 @@
     "vocabulary": [
       {
         "word": "牺牲",
-        "meaning": "희생하다, 목숨을 바치다",
+        "meaning": "희생하다, 희생되다",
         "pinyin": "xī shēng",
-        "example": "为了祖国，他牺牲了自己的生命。(조국을 위해 그는 자신의 목숨을 바쳤다.)"
+        "example": "他为国家牺牲了自己的生命。(그는 국가를 위해 자신의 생명을 희생했다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "许多人为了国家的和平牺牲了生命。",
+          "tokens": [
+            "许多",
+            "人",
+            "为了",
+            "国家",
+            "的",
+            "和平",
+            "牺牲",
+            "了",
+            "生命"
+          ]
+        }
       }
     ]
   },
@@ -304,9 +415,22 @@
     "vocabulary": [
       {
         "word": "后来",
-        "meaning": "나중에, 후에, 결국",
+        "meaning": "나중에",
         "pinyin": "hòu lái",
-        "example": "他后来去了北京。(그는 나중에 베이징에 갔다.)"
+        "example": "到了后来，他终于明白了真相。(결국에는 그가 진상을 이해하게 되었다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "后来我才知道真相是什么。",
+          "tokens": [
+            "后来",
+            "我",
+            "才",
+            "知道",
+            "真相",
+            "是",
+            "什么"
+          ]
+        }
       }
     ]
   },
@@ -423,10 +547,21 @@
     "text_kr": "한 사람 더 남았네",
     "vocabulary": [
       {
-        "word": "剩下",
-        "meaning": "남다, 남아있다",
-        "pinyin": "shèng xià",
-        "example": "只剩下我一个人了。(나 혼자만 남았다.)"
+        "word": "还剩下",
+        "meaning": "아직 남다",
+        "pinyin": "hái shèng xià",
+        "example": "冰箱里还剩下一些水果。(냉장고에 과일이 조금 남아있다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "冰箱里还剩下一些蔬菜。",
+          "tokens": [
+            "冰箱",
+            "里",
+            "还剩下",
+            "一些",
+            "蔬菜"
+          ]
+        }
       }
     ]
   },
@@ -509,15 +644,42 @@
     "vocabulary": [
       {
         "word": "不回来",
-        "meaning": "돌아오지 않다, 집에 오지 않다",
+        "meaning": "돌아오지 않다",
         "pinyin": "bù huí lái",
-        "example": "他今天不回来了。(그는 오늘 돌아오지 않는다.)"
+        "example": "如果他不回来，我们就开始吃饭。(만약 그가 돌아오지 않으면, 우리는 식사를 시작할 것이다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "如果他晚上不回来，我会很担心。",
+          "tokens": [
+            "如果",
+            "他",
+            "晚上",
+            "不回来",
+            "，",
+            "我",
+            "会",
+            "很",
+            "担心"
+          ]
+        }
       },
       {
-        "word": "就",
-        "meaning": "~하면, ~하자마자",
-        "pinyin": "jiù",
-        "example": "吃完饭就睡觉。(밥 먹고 나서 바로 잔다.)"
+        "word": "一个人睡",
+        "meaning": "혼자 자다",
+        "pinyin": "yī gè rén shuì",
+        "example": "孩子害怕一个人睡。(아이는 혼자 자는 것을 무서워한다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "小孩子不喜欢一个人睡觉。",
+          "tokens": [
+            "小",
+            "孩子",
+            "不",
+            "喜欢",
+            "一个人睡",
+            "觉"
+          ]
+        }
       }
     ]
   },
@@ -606,16 +768,25 @@
     "text_kr": "잘 좀 보고 배워라",
     "vocabulary": [
       {
-        "word": "好好",
-        "meaning": "잘, 제대로, 열심히",
-        "pinyin": "hǎo hǎo",
-        "example": "你要好好学习。(너는 열심히 공부해야 한다.)"
-      },
-      {
-        "word": "跟人",
-        "meaning": "사람을 따라, 사람에게서",
-        "pinyin": "gēn rén",
-        "example": "跟人学习。(사람에게서 배우다.)"
+        "word": "得",
+        "meaning": "~해야 한다(의무)",
+        "pinyin": "děi",
+        "example": "你得按时完成作业。(너는 제시간에 숙제를 끝내야 한다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "他生病了，得去医院看医生。",
+          "tokens": [
+            "他",
+            "生病",
+            "了",
+            "，",
+            "得",
+            "去",
+            "医院",
+            "看",
+            "医生"
+          ]
+        }
       }
     ]
   },
@@ -800,14 +971,57 @@
     "start_time": "00:08:05,474",
     "end_time": "00:08:07,181",
     "text_cn": "你肯定要写那棵山楂树吧",
-    "text_kr": "그럼 저기 ‘산사나무’도 꼭 써야겠네"
+    "text_kr": "그럼 저기 ‘산사나무’도 꼭 써야겠네",
+    "vocabulary": [
+      {
+        "word": "肯定要",
+        "meaning": "반드시 ~해야 한다",
+        "pinyin": "kěn dìng yào",
+        "example": "明天肯定要下雨。(내일은 반드시 비가 올 것이다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "你肯定要好好学习才能考上大学。",
+          "tokens": [
+            "你",
+            "肯定要",
+            "好好",
+            "学习",
+            "才能",
+            "考上",
+            "大学",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 100,
     "start_time": "00:08:07,181",
     "end_time": "00:08:09,006",
     "text_cn": "你怎么知道",
-    "text_kr": "어떻게 알아요"
+    "text_kr": "어떻게 알아요",
+    "vocabulary": [
+      {
+        "word": "你怎么",
+        "meaning": "어떻게 ~하니",
+        "pinyin": "nǐ zěn me",
+        "example": "你怎么知道的？(어떻게 알았어?)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "你怎么这么晚才来？",
+          "tokens": [
+            "你",
+            "怎么",
+            "这么",
+            "晚",
+            "才",
+            "来",
+            "？"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 101,
@@ -835,14 +1049,79 @@
     "start_time": "00:08:29,972",
     "end_time": "00:08:31,937",
     "text_cn": "给小孩吃吧",
-    "text_kr": "아이 먹으라고 줘요"
+    "text_kr": "아이 먹으라고 줘요",
+    "vocabulary": [
+      {
+        "word": "给小孩吃吧",
+        "meaning": "아이에게 먹이라고 주세요",
+        "pinyin": "gěi xiǎo hái chī ba",
+        "example": "这个苹果给小孩吃吧。(이 사과는 아이에게 먹이라고 주세요.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "这些糖果给小孩吃吧。",
+          "tokens": [
+            "这些",
+            "糖果",
+            "给",
+            "小孩",
+            "吃",
+            "吧",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 105,
     "start_time": "00:08:31,937",
     "end_time": "00:08:33,778",
     "text_cn": "不是小孩就不能吃糖了",
-    "text_kr": "아이 아니면 사탕도 못 먹나"
+    "text_kr": "아이 아니면 사탕도 못 먹나",
+    "vocabulary": [
+      {
+        "word": "不是",
+        "meaning": "아니다, 그렇지 않다",
+        "pinyin": "bù shì",
+        "example": "不是这样的。(그런 게 아니야.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "不是我不想去，而是没时间。",
+          "tokens": [
+            "不是",
+            "我",
+            "不想",
+            "去",
+            "，",
+            "而是",
+            "没",
+            "时间",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "就不能",
+        "meaning": "~할 수 없다",
+        "pinyin": "jiù bù néng",
+        "example": "没有钱就不能买。(돈이 없으면 살 수 없다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "不努力学习就不能考上好大学。",
+          "tokens": [
+            "不",
+            "努力",
+            "学习",
+            "就",
+            "不能",
+            "考上",
+            "好",
+            "大学",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 106,
@@ -870,7 +1149,27 @@
     "start_time": "00:08:57,282",
     "end_time": "00:08:59,149",
     "text_cn": "五十年代在中国很流行",
-    "text_kr": "50년대 중국에서 꽤 유행했지"
+    "text_kr": "50년대 중국에서 꽤 유행했지",
+    "vocabulary": [
+      {
+        "word": "很流行",
+        "meaning": "매우 유행하다",
+        "pinyin": "hěn liú xíng",
+        "example": "这首歌很流行。(이 노래는 매우 유행한다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "这种发型现在很流行。",
+          "tokens": [
+            "这种",
+            "发型",
+            "现在",
+            "很",
+            "流行",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 110,
@@ -912,14 +1211,76 @@
     "start_time": "00:09:09,467",
     "end_time": "00:09:12,864",
     "text_cn": "我就是想弄清楚, 因为要写在教材里",
-    "text_kr": "교재 내용으로 쓰려면, 확실히 해 두어야 해서요"
+    "text_kr": "교재 내용으로 쓰려면, 확실히 해 두어야 해서요",
+    "vocabulary": [
+      {
+        "word": "弄清楚",
+        "meaning": "명확히 하다, 확실히 하다",
+        "pinyin": "nòng qīng chu",
+        "example": "我要弄清楚这个问题。(이 문제를 명확히 해야겠다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我们必须弄清楚事情的真相。",
+          "tokens": [
+            "我们",
+            "必须",
+            "弄清楚",
+            "事情",
+            "的",
+            "真相",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 116,
     "start_time": "00:09:12,864",
     "end_time": "00:09:15,407",
     "text_cn": "你怎么听就怎么写",
-    "text_kr": "그냥 들은 대로 쓰면 되지"
+    "text_kr": "그냥 들은 대로 쓰면 되지",
+    "vocabulary": [
+      {
+        "word": "怎么听",
+        "meaning": "어떻게 듣다",
+        "pinyin": "zěn me tīng",
+        "example": "怎么听都听不懂。(어떻게 들어도 이해가 안 된다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "怎么听都觉得有问题。",
+          "tokens": [
+            "怎么",
+            "听",
+            "都",
+            "觉得",
+            "有",
+            "问题",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "怎么写",
+        "meaning": "어떻게 쓰다",
+        "pinyin": "zěn me xiě",
+        "example": "这个字怎么写？(이 글자는 어떻게 써?)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我不知道这个字怎么写。",
+          "tokens": [
+            "我",
+            "不",
+            "知道",
+            "这个",
+            "字",
+            "怎么",
+            "写",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 117,
@@ -940,14 +1301,112 @@
     "start_time": "00:09:19,101",
     "end_time": "00:09:21,662",
     "text_cn": "那还不简单",
-    "text_kr": "그렇게 중요하다면"
+    "text_kr": "그렇게 중요하다면",
+    "vocabulary": [
+      {
+        "word": "还不简单",
+        "meaning": "아직 간단하지 않다",
+        "pinyin": "hái bù jiǎn dān",
+        "example": "这个问题还不简单。(이 문제는 아직 간단하지 않다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "学中文还不简单呢。",
+          "tokens": [
+            "学",
+            "中文",
+            "还",
+            "不",
+            "简单",
+            "呢",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 120,
     "start_time": "00:09:21,662",
     "end_time": "00:09:24,343",
     "text_cn": "等开花的时候你来看一眼不就清楚了",
-    "text_kr": "꽃 필 때쯤 와서 눈으로 확인하면 되잖아"
+    "text_kr": "꽃 필 때쯤 와서 눈으로 확인하면 되잖아",
+    "vocabulary": [
+      {
+        "word": "等",
+        "meaning": "기다리다",
+        "pinyin": "děng",
+        "example": "我等你。(널 기다릴게.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "等一会儿再走吧。",
+          "tokens": [
+            "等",
+            "一会儿",
+            "再",
+            "走",
+            "吧",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "时候",
+        "meaning": "때, 시간",
+        "pinyin": "shí hou",
+        "example": "什么时候来？(언제 와?)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "小时候我很喜欢画画。",
+          "tokens": [
+            "小",
+            "时候",
+            "我",
+            "很",
+            "喜欢",
+            "画画",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "看一眼",
+        "meaning": "한 번 보다",
+        "pinyin": "kàn yī yǎn",
+        "example": "让我看一眼。(한 번 보게 해줘.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "请你再看一眼这个字。",
+          "tokens": [
+            "请",
+            "你",
+            "再",
+            "看",
+            "一眼",
+            "这个",
+            "字",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "不就",
+        "meaning": "~하지 않나",
+        "pinyin": "bù jiù",
+        "example": "这样不就清楚了吗？(이렇게 하면 명확하지 않나?)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "问老师不就知道了。",
+          "tokens": [
+            "问",
+            "老师",
+            "不就",
+            "知道",
+            "了",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 121,
@@ -975,7 +1434,66 @@
     "start_time": "00:09:29,700",
     "end_time": "00:09:31,117",
     "text_cn": "那到时候你再来一趟",
-    "text_kr": "그럼 꽃 필 때 니가 다시 오면"
+    "text_kr": "그럼 꽃 필 때 니가 다시 오면",
+    "vocabulary": [
+      {
+        "word": "到时候",
+        "meaning": "그때가 되면",
+        "pinyin": "dào shí hou",
+        "example": "到时候再说吧。(그때가 되면 다시 말하자.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "到时候你就知道了。",
+          "tokens": [
+            "到",
+            "时候",
+            "你",
+            "就",
+            "知道",
+            "了",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "一趟",
+        "meaning": "한 번, 한 차례",
+        "pinyin": "yī tàng",
+        "example": "去一趟北京。(베이징에 한 번 가다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "我要去一趟超市。",
+          "tokens": [
+            "我",
+            "要",
+            "去",
+            "一趟",
+            "超市",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "陪你",
+        "meaning": "너와 함께 하다",
+        "pinyin": "péi nǐ",
+        "example": "我陪你一起去。(같이 가줄게.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "明天我陪你去看电影。",
+          "tokens": [
+            "明天",
+            "我",
+            "陪",
+            "你",
+            "去",
+            "看",
+            "电影",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 125,
@@ -989,7 +1507,45 @@
     "start_time": "00:09:33,068",
     "end_time": "00:09:37,686",
     "text_cn": "就怕以后没时间了",
-    "text_kr": "나중에 올 수 있을지 모르겠네요"
+    "text_kr": "나중에 올 수 있을지 모르겠네요",
+    "vocabulary": [
+      {
+        "word": "就怕",
+        "meaning": "걱정되는 것은",
+        "pinyin": "jiù pà",
+        "example": "就怕下雨。(걱정되는 것은 비가 오는 것이다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "就怕明天会下雨。",
+          "tokens": [
+            "就",
+            "怕",
+            "明天",
+            "会",
+            "下雨",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "以后",
+        "meaning": "이후, 나중에",
+        "pinyin": "yǐ hòu",
+        "example": "以后再说吧。(나중에 다시 말하자.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "以后我要好好学习。",
+          "tokens": [
+            "以后",
+            "我",
+            "要",
+            "好好",
+            "学习",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 127,
@@ -1108,7 +1664,48 @@
     "start_time": "00:10:13,089",
     "end_time": "00:10:15,048",
     "text_cn": "大妈拿我当儿子, 就叫我老三",
-    "text_kr": "이 집에서 아들처럼 생각하셔서, 셋째라고 부르시는 거야"
+    "text_kr": "이 집에서 아들처럼 생각하셔서, 셋째라고 부르시는 거야",
+    "vocabulary": [
+      {
+        "word": "拿",
+        "meaning": "가져가다, 취하다",
+        "pinyin": "ná",
+        "example": "拿一本书。(책 한 권 가져가.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "请帮我拿一下包。",
+          "tokens": [
+            "请",
+            "帮",
+            "我",
+            "拿",
+            "一下",
+            "包",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "当",
+        "meaning": "~로 여기다, ~로 생각하다",
+        "pinyin": "dàng",
+        "example": "拿我当朋友。(나를 친구로 여겨.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "他拿我当最好的朋友。",
+          "tokens": [
+            "他",
+            "拿",
+            "我",
+            "当",
+            "最好",
+            "的",
+            "朋友",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 144,
@@ -1122,7 +1719,44 @@
     "start_time": "00:10:20,735",
     "end_time": "00:10:22,373",
     "text_cn": "你就叫我名字好了",
-    "text_kr": "그냥 이름으로 불러도 돼"
+    "text_kr": "그냥 이름으로 불러도 돼",
+    "vocabulary": [
+      {
+        "word": "就叫我",
+        "meaning": "그냥 나를 ~라고 불러",
+        "pinyin": "jiù jiào wǒ",
+        "example": "就叫我小张吧。(그냥 나를 소장이라고 불러.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "就叫我老师吧。",
+          "tokens": [
+            "就",
+            "叫",
+            "我",
+            "老师",
+            "吧",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "好了",
+        "meaning": "좋다, 됐다",
+        "pinyin": "hǎo le",
+        "example": "这样就好了。(이렇게 하면 좋다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "作业写好了。",
+          "tokens": [
+            "作业",
+            "写",
+            "好",
+            "了",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 146,
@@ -1164,7 +1798,67 @@
     "start_time": "00:10:52,000",
     "end_time": "00:10:56,095",
     "text_cn": "来给三爹把扣子解开",
-    "text_kr": "자 삼촌 단추 좀 풀어줘"
+    "text_kr": "자 삼촌 단추 좀 풀어줘",
+    "vocabulary": [
+      {
+        "word": "给",
+        "meaning": "~에게, ~를 위해",
+        "pinyin": "gěi",
+        "example": "给我一杯水。(나에게 물 한 잔 줘.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "请给我一张纸。",
+          "tokens": [
+            "请",
+            "给",
+            "我",
+            "一",
+            "张",
+            "纸",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "把",
+        "meaning": "~를, ~을 (목적어를 앞으로)",
+        "pinyin": "bǎ",
+        "example": "把门关上。(문을 닫아.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "请把书放在桌子上。",
+          "tokens": [
+            "请",
+            "把",
+            "书",
+            "放",
+            "在",
+            "桌子",
+            "上",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "解开",
+        "meaning": "풀다, 해제하다",
+        "pinyin": "jiě kāi",
+        "example": "解开扣子。(단추를 풀어.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "请帮我解开这个结。",
+          "tokens": [
+            "请",
+            "帮",
+            "我",
+            "解开",
+            "这个",
+            "结",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 152,
@@ -1199,7 +1893,47 @@
     "start_time": "00:11:50,153",
     "end_time": "00:11:52,311",
     "text_cn": "真是可惜你的才华了",
-    "text_kr": "좀 아까운 재주 아닌가"
+    "text_kr": "좀 아까운 재주 아닌가",
+    "vocabulary": [
+      {
+        "word": "可惜",
+        "meaning": "아쉽다, 유감이다",
+        "pinyin": "kě xī",
+        "example": "真可惜。(정말 아쉽다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "可惜今天下雨了。",
+          "tokens": [
+            "可惜",
+            "今天",
+            "下雨",
+            "了",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "才华",
+        "meaning": "재능, 재주",
+        "pinyin": "cái huá",
+        "example": "很有才华。(재능이 많다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "他是一个很有才华的画家。",
+          "tokens": [
+            "他",
+            "是",
+            "一个",
+            "很",
+            "有",
+            "才华",
+            "的",
+            "画家",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 157,
@@ -1220,7 +1954,26 @@
     "start_time": "00:11:55,146",
     "end_time": "00:11:56,643",
     "text_cn": "一定要写好",
-    "text_kr": "당연히 제대로 써야지"
+    "text_kr": "당연히 제대로 써야지",
+    "vocabulary": [
+      {
+        "word": "一定要",
+        "meaning": "반드시 ~해야 한다",
+        "pinyin": "yī dìng yào",
+        "example": "一定要来。(반드시 와야 해.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "明天一定要早起。",
+          "tokens": [
+            "明天",
+            "一定",
+            "要",
+            "早起",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 160,
@@ -1241,7 +1994,47 @@
     "start_time": "00:12:01,057",
     "end_time": "00:12:03,613",
     "text_cn": "高中毕业之后就能留校工作",
-    "text_kr": "고등학교 졸업하고 학교에 남을 수 있거든"
+    "text_kr": "고등학교 졸업하고 학교에 남을 수 있거든",
+    "vocabulary": [
+      {
+        "word": "之后",
+        "meaning": "이후, 그 후",
+        "pinyin": "zhī hòu",
+        "example": "毕业之后。(졸업한 후.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "吃饭之后我们去散步。",
+          "tokens": [
+            "吃饭",
+            "之后",
+            "我们",
+            "去",
+            "散步",
+            "。"
+          ]
+        }
+      },
+      {
+        "word": "留校",
+        "meaning": "학교에 남다",
+        "pinyin": "liú xiào",
+        "example": "毕业后留校工作。(졸업 후 학교에 남아서 일하다.)",
+        "quiz": {
+          "quiz_type": "order_sentence",
+          "text_cn": "他想毕业后留校当老师。",
+          "tokens": [
+            "他",
+            "想",
+            "毕业",
+            "后",
+            "留校",
+            "当",
+            "老师",
+            "。"
+          ]
+        }
+      }
+    ]
   },
   {
     "line": 163,
