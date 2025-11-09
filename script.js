@@ -3,6 +3,7 @@ const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 유튜브 ID를 입�
 const DEFAULT_SYNC_OFFSET = 4.7; // 기본 싱크 오프셋 (초 단위)
 let syncOffset = DEFAULT_SYNC_OFFSET;
 let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
+let firstDictationIndex = -1;
 
 // DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,6 +13,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
+    const dictationJumpBtn = document.getElementById('jump-to-dictation-btn');
+
+    if (dictationJumpBtn) {
+        dictationJumpBtn.addEventListener('click', () => {
+            jumpToFirstDictation();
+        });
+    }
+
     // 단어 발음 버튼 이벤트 리스너
     document.body.addEventListener('click', function(e) {
         if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
@@ -49,16 +58,28 @@ document.addEventListener('DOMContentLoaded', function() {
     // 방문한 어휘 스타일 추가
     const style = document.createElement('style');
     style.textContent = `
-        .vocab.visited {
-            background-color: #e0f7fa;
-            color: #0097a7;
-            border: 1px dashed #00838f;
-        }
-        
-        .vocab.active.visited {
-            background-color: #80deea;
+        .vocab-study.visited {
+            background-color: #d4f1f8;
             color: #006064;
             border: 1px solid #00838f;
+        }
+        
+        .vocab-study.active.visited {
+            background-color: #80deea;
+            color: #004d56;
+            border: 1px solid #006064;
+        }
+
+        .vocab-dictation.visited {
+            background-color: #ffe6cc;
+            color: #bf360c;
+            border: 1px solid #ff9800;
+        }
+
+        .vocab-dictation.active.visited {
+            background-color: #ffd699;
+            color: #e65100;
+            border: 1px solid #f57c00;
         }
     `;
     document.head.appendChild(style);
@@ -146,7 +167,17 @@ async function fetchSubtitles() {
             end: timeStringToSeconds(item.end_time),
             text_cn: item.text_cn || "",
             text_kr: item.text_kr || "",
-            vocabulary: item.vocabulary || []
+            vocabulary: (item.vocabulary || []).map(v => {
+                const {
+                    word = "",
+                    meaning = "",
+                    pinyin = "",
+                    example = "",
+                    quiz = undefined,
+                    type = "study"
+                } = v;
+                return { word, meaning, pinyin, example, quiz, type };
+            })
         }));
         displaySubtitles();
     } catch (err) {
@@ -161,12 +192,20 @@ function displaySubtitles() {
     const container = document.getElementById('subtitles');
     container.innerHTML = '';
     
+    firstDictationIndex = -1;
+    clearDictationFocus();
+
     subtitles.forEach((sub, index) => {
         const div = document.createElement('div');
         div.className = 'subtitle-line';
         div.dataset.index = index;
         
         let cn = sub.text_cn;
+        const hasDictation = sub.vocabulary && sub.vocabulary.some(v => (v.type || 'study') === 'dictation');
+        div.dataset.dictation = hasDictation ? 'true' : 'false';
+        if (hasDictation && firstDictationIndex === -1) {
+            firstDictationIndex = index;
+        }
         
         // 어휘가 있을 경우 블랭크 처리
         if (sub.vocabulary && sub.vocabulary.length) {
@@ -175,20 +214,32 @@ function displaySubtitles() {
                 const wordPattern = new RegExp(v.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
                 // 퀴즈 데이터도 함께 저장
                 const quizData = v.quiz ? JSON.stringify(v.quiz).replace(/"/g, '&quot;') : '';
-                cn = cn.replace(wordPattern, `<span class='vocab' data-word='${v.word}' data-pinyin='${v.pinyin}' data-meaning='${v.meaning}' data-example='${v.example}' data-quiz='${quizData}'>____</span>`);
+                const type = v.type || 'study';
+                const typeClass = type === 'dictation' ? 'vocab-dictation' : 'vocab-study';
+                const safeWord = (v.word || '').replace(/'/g, '&#39;');
+                const safeMeaning = (v.meaning || '').replace(/'/g, '&#39;');
+                const safePinyin = (v.pinyin || '').replace(/'/g, '&#39;');
+                const safeExample = (v.example || '').replace(/'/g, '&#39;');
+                cn = cn.replace(
+                    wordPattern,
+                    `<span class='vocab ${typeClass}' data-type='${type}' data-word='${safeWord}' data-pinyin='${safePinyin}' data-meaning='${safeMeaning}' data-example='${safeExample}' data-quiz='${quizData}'>____</span>`
+                );
             });
         }
         
         // 반복 청취 버튼 추가
+        const repeatBtnClass = hasDictation ? 'repeat-btn dictation' : 'repeat-btn study';
         div.innerHTML = `
             <div class="cn-text">${cn}</div>
             <div class="kr-text">${sub.text_kr}</div>
-            <button class="repeat-btn" data-index="${index}">반복</button>
+            <button class="${repeatBtnClass}" data-index="${index}">반복</button>
         `;
         
         container.appendChild(div);
     });
     
+    updateDictationShortcutState();
+
     // 블랭크 클릭 이벤트 추가
     document.querySelectorAll('.vocab').forEach(el => {
         el.addEventListener('click', (e) => {
@@ -197,13 +248,15 @@ function displaySubtitles() {
             e.target.classList.add('active');
             
             // 어휘 정보 표시
-            const word = e.target.dataset.word;
-            const meaning = e.target.dataset.meaning;
-            const pinyin = e.target.dataset.pinyin;
-            const example = e.target.dataset.example;
+            const decode = (value) => (value || '').replace(/&#39;/g, "'");
+            const word = decode(e.target.dataset.word);
+            const meaning = decode(e.target.dataset.meaning);
+            const pinyin = decode(e.target.dataset.pinyin);
+            const example = decode(e.target.dataset.example);
             const quizData = e.target.dataset.quiz;
+            const type = e.target.dataset.type || 'study';
             
-            displayVocabDetail(word, pinyin, meaning, example, quizData);
+            displayVocabDetail(word, pinyin, meaning, example, quizData, type);
             
             // 퀴즈 데이터가 있으면 바로 퀴즈 시작 (3번 요구사항)
             if (quizData && quizData !== 'undefined') {
@@ -239,22 +292,81 @@ function displaySubtitles() {
     });
 }
 
+function updateDictationShortcutState() {
+    const btn = document.getElementById('jump-to-dictation-btn');
+    if (!btn) return;
+    
+    if (firstDictationIndex >= 0) {
+        btn.disabled = false;
+        btn.title = '첫 번째 받아쓰기 구간으로 이동합니다.';
+    } else {
+        btn.disabled = true;
+        btn.title = '받아쓰기 블랭크가 있는 구간이 없습니다.';
+    }
+}
+
+function clearDictationFocus() {
+    document.querySelectorAll('.subtitle-line.dictation-focus').forEach(el => {
+        el.classList.remove('dictation-focus');
+    });
+}
+
+function jumpToFirstDictation() {
+    if (firstDictationIndex < 0) return;
+    
+    const target = document.querySelector(`.subtitle-line[data-index='${firstDictationIndex}']`);
+    if (!target) return;
+    
+    clearDictationFocus();
+    target.classList.add('dictation-focus');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+}
+
 // 어휘 정보 표시
-function displayVocabDetail(word, pinyin, meaning, example, quizData) {
+function displayVocabDetail(word, pinyin, meaning, example, quizData, type = 'study') {
     document.getElementById('no-vocab-message').style.display = 'none';
     document.getElementById('vocab-content').style.display = 'block';
     
     document.getElementById('vocab-title').textContent = word;
-    document.getElementById('vocab-pinyin').textContent = pinyin;
-    document.getElementById('vocab-meaning').textContent = meaning;
+    
+    const detailEl = document.getElementById('vocab-detail');
+    if (detailEl) {
+        detailEl.dataset.type = type;
+    }
+
+    const pinyinEl = document.getElementById('vocab-pinyin');
+    const meaningEl = document.getElementById('vocab-meaning');
+    const typeBadgeEl = document.getElementById('vocab-type-badge');
+    
+    pinyinEl.textContent = pinyin;
+    pinyinEl.style.display = pinyin ? 'block' : 'none';
+    
+    const meaningText = meaning || (type === 'dictation' ? '받아쓰기용 블랭크 (설명 없음)' : '');
+    meaningEl.textContent = meaningText;
+    meaningEl.style.display = meaningText ? 'block' : 'none';
+    
+    if (typeBadgeEl) {
+        typeBadgeEl.textContent = type === 'dictation' ? '받아쓰기' : '학습';
+        typeBadgeEl.classList.remove('dictation', 'study');
+        typeBadgeEl.classList.add(type === 'dictation' ? 'dictation' : 'study');
+        typeBadgeEl.style.display = 'inline-block';
+    }
     
     // 예문 분리 (중국어/한국어)
-    const exampleParts = example.split('(');
-    if (exampleParts.length > 1) {
-        document.getElementById('vocab-example-cn').textContent = exampleParts[0].trim();
-        document.getElementById('vocab-example-kr').textContent = '(' + exampleParts[1];
-    } else {
-        document.getElementById('vocab-example-cn').textContent = example;
+    const exampleContainer = document.querySelector('#vocab-content .example');
+    if (example && example.trim().length) {
+        const exampleParts = example.split('(');
+        if (exampleParts.length > 1) {
+            document.getElementById('vocab-example-cn').textContent = exampleParts[0].trim();
+            document.getElementById('vocab-example-kr').textContent = '(' + exampleParts[1];
+        } else {
+            document.getElementById('vocab-example-cn').textContent = example;
+            document.getElementById('vocab-example-kr').textContent = '';
+        }
+        exampleContainer.style.display = 'block';
+    } else if (exampleContainer) {
+        exampleContainer.style.display = 'none';
+        document.getElementById('vocab-example-cn').textContent = '';
         document.getElementById('vocab-example-kr').textContent = '';
     }
     
