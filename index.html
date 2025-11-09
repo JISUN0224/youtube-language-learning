@@ -331,6 +331,10 @@
         <span id="sync-status">자막 싱크</span>
         <button id="sync-forward">+1초 ▶</button>
       </div>
+      <div class="dictation-shortcut-container">
+        <button id="jump-to-dictation-btn" disabled>받아쓰기 첫 구간으로 이동</button>
+        <span class="shortcut-hint">받아쓰기 블랭크까지 바로 이동</span>
+      </div>
     </div>
     
     <!-- 메인 콘텐츠 영역 -->
@@ -356,6 +360,7 @@
           <div id="vocab-content" style="display: none;">
             <div class="vocab-header">
               <h2 class="vocab-title" id="vocab-title">단어</h2>
+              <span class="vocab-type-badge" id="vocab-type-badge"></span>
               <button class="pronunciation-btn" id="pronunciation-btn">발음 듣기</button>
             </div>
             
