@@ -194,6 +194,7 @@ function displaySubtitles() {
     
     firstDictationIndex = -1;
     clearDictationFocus();
+    const dictationEntries = [];
 
     subtitles.forEach((sub, index) => {
         const div = document.createElement('div');
@@ -236,9 +237,21 @@ function displaySubtitles() {
         `;
         
         container.appendChild(div);
+
+        if (hasDictation) {
+            const dictationCn = cn
+                .replace(/<span[^>]*>____<\/span>/g, '(   )')
+                .replace(/<[^>]+>/g, '');
+            dictationEntries.push({
+                index,
+                cn: dictationCn,
+                kr: sub.text_kr || ''
+            });
+        }
     });
     
     updateDictationShortcutState();
+    renderDictationLines(dictationEntries);
 
     // 블랭크 클릭 이벤트 추가
     document.querySelectorAll('.vocab').forEach(el => {
@@ -623,4 +636,41 @@ function stopRepeatPlayback() {
             btn.textContent = '반복';
         });
     }
+}
+
+function renderDictationLines(lines) {
+    const container = document.getElementById('dictation-lines');
+    if (!container) return;
+
+    if (!lines.length) {
+        container.innerHTML = '<div class="dictation-line-item"><div class="dictation-kr">받아쓰기 블랭크가 포함된 자막이 없습니다.</div></div>';
+        return;
+    }
+
+    const escapeHtml = (str = '') =>
+        str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+    container.innerHTML = lines.map(({ index, cn, kr }) => `
+        <div class="dictation-line-item" data-index="${index}">
+            <div class="dictation-cn">${escapeHtml(cn)}</div>
+            ${kr ? `<div class="dictation-kr">${escapeHtml(kr)}</div>` : ''}
+        </div>
+    `).join('');
+
+    container.querySelectorAll('.dictation-line-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.index, 10);
+            const target = document.querySelector(`.subtitle-line[data-index='${idx}']`);
+            if (target) {
+                clearDictationFocus();
+                target.classList.add('dictation-focus');
+                target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            }
+        });
+    });
 }
