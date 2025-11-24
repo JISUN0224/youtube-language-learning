@@ -4994,6 +4994,13 @@
     "text_kr": "아니라면 상점에서 이걸 왜 팔겠어",
     "vocabulary": [
       {
+        "word": "要不",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      },
+      {
         "word": "怎么会",
         "meaning": "",
         "pinyin": "",
@@ -5092,6 +5099,13 @@
     "vocabulary": [
       {
         "word": "好不容易",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      },
+      {
+        "word": "见你一面",
         "meaning": "",
         "pinyin": "",
         "example": "",
