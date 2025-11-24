@@ -21,6 +21,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    const jumpToLine344Btn = document.getElementById('jump-to-line344-btn');
+
+    if (jumpToLine344Btn) {
+        jumpToLine344Btn.addEventListener('click', () => {
+            jumpToLine344();
+        });
+    }
+
     // 단어 발음 버튼 이벤트 리스너
     document.body.addEventListener('click', function(e) {
         if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
@@ -163,6 +171,7 @@ async function fetchSubtitles() {
         const res = await fetch('shanzhashuzhilian_cnkr_converted.json');
         const raw = await res.json();
         subtitles = raw.map(item => ({
+            line: item.line || 0,
             start: timeStringToSeconds(item.start_time),
             end: timeStringToSeconds(item.end_time),
             text_cn: item.text_cn || "",
@@ -204,6 +213,11 @@ function displaySubtitles() {
         let cn = sub.text_cn;
         const hasDictation = sub.vocabulary && sub.vocabulary.some(v => (v.type || 'study') === 'dictation');
         div.dataset.dictation = hasDictation ? 'true' : 'false';
+        // line 445를 첫 번째 받아쓰기 구간으로 우선 지정
+        if (hasDictation && sub.line === 445) {
+            firstDictationIndex = index;
+        }
+        // line 445가 없으면 첫 번째 받아쓰기를 찾음
         if (hasDictation && firstDictationIndex === -1) {
             firstDictationIndex = index;
         }
@@ -251,6 +265,7 @@ function displaySubtitles() {
     });
     
     updateDictationShortcutState();
+    updateLine344ButtonState();
     renderDictationLines(dictationEntries);
 
     // 블랭크 클릭 이벤트 추가
@@ -318,6 +333,20 @@ function updateDictationShortcutState() {
     }
 }
 
+function updateLine344ButtonState() {
+    const btn = document.getElementById('jump-to-line344-btn');
+    if (!btn) return;
+    
+    const line344Index = subtitles.findIndex(sub => sub.line === 344);
+    if (line344Index >= 0) {
+        btn.disabled = false;
+        btn.title = 'Line 344로 이동합니다.';
+    } else {
+        btn.disabled = true;
+        btn.title = 'Line 344를 찾을 수 없습니다.';
+    }
+}
+
 function clearDictationFocus() {
     document.querySelectorAll('.subtitle-line.dictation-focus').forEach(el => {
         el.classList.remove('dictation-focus');
@@ -328,6 +357,19 @@ function jumpToFirstDictation() {
     if (firstDictationIndex < 0) return;
     
     const target = document.querySelector(`.subtitle-line[data-index='${firstDictationIndex}']`);
+    if (!target) return;
+    
+    clearDictationFocus();
+    target.classList.add('dictation-focus');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+}
+
+function jumpToLine344() {
+    // line 344를 찾아서 이동
+    const line344Index = subtitles.findIndex(sub => sub.line === 344);
+    if (line344Index < 0) return;
+    
+    const target = document.querySelector(`.subtitle-line[data-index='${line344Index}']`);
     if (!target) return;
     
     clearDictationFocus();
