@@ -1,721 +1,737 @@
-body {
-  font-family: 'Noto Sans SC', 'Noto Sans KR', sans-serif;
-  background-color: #f9f9f9;
-  padding: 20px;
-  margin: 0;
-  line-height: 1.6;
-}
+let player, subtitles = [], currentSubtitleIndex = -1;
+const fixedVideoId = "K9LGQu3QnpU"; // 여기에 고정할 유튜브 ID를 입력하세요
+const DEFAULT_SYNC_OFFSET = 4.7; // 기본 싱크 오프셋 (초 단위)
+let syncOffset = DEFAULT_SYNC_OFFSET;
+let loopingInterval = null; // 반복 재생을 위한 인터벌 변수
+let firstDictationIndex = -1;
 
-.container {
-  max-width: 1200px; /* 좀 더 넓게 조정 */
-  margin: auto;
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-}
-
-h1 {
-  text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-}
-
-/* 사용자 가이드 스타일 */
-.usage-guide {
-  background-color: #f8f9fa;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border-left: 5px solid #4285f4;
-}
+// DOM이 로드된 후 실행
+document.addEventListener('DOMContentLoaded', function() {
+    // YouTube API 스크립트 로드
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
-.usage-guide h3 {
-  margin-top: 0;
-  color: #333;
-}
+    const dictationJumpBtn = document.getElementById('jump-to-dictation-btn');
+
+    if (dictationJumpBtn) {
+        dictationJumpBtn.addEventListener('click', () => {
+            jumpToFirstDictation();
+        });
+    }
+
+    const jumpToLine344Btn = document.getElementById('jump-to-line344-btn');
+
+    if (jumpToLine344Btn) {
+        jumpToLine344Btn.addEventListener('click', () => {
+            jumpToLine344();
+        });
+    }
+
+    // 단어 발음 버튼 이벤트 리스너
+    document.body.addEventListener('click', function(e) {
+        if (e.target.id === 'pronunciation-btn' || e.target.closest('#pronunciation-btn')) {
+            const word = document.getElementById('vocab-title').textContent;
+            if (word) {
+                speakChinese(word);
+            }
+        }
+    });
     
-.usage-guide ul {
-  margin-bottom: 0;
-  padding-left: 20px;
-}
+    // 예문 발음 버튼 이벤트 리스너
+    document.body.addEventListener('click', function(e) {
+        if (e.target.id === 'example-pronunciation-btn' || e.target.closest('#example-pronunciation-btn')) {
+            const example = document.getElementById('vocab-example-cn').textContent;
+            if (example) {
+                speakChinese(example);
+            }
+        }
+    });
     
-.usage-guide li {
-  margin-bottom: 8px;
-}
-
-.instructions {
-  background-color: #eef;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  margin-bottom: 20px;
-}
-
-/* 메인 콘텐츠 영역 - 비디오, 자막, 어휘 정보 패널 */
-.main-content {
-  display: flex;
-  gap: 20px;
-  margin-top: 20px;
-}
-
-.left-panel {
-  flex: 3; /* 왼쪽 패널이 더 넓게 */
-  display: flex;
-  flex-direction: column;
-}
-
-.right-panel {
-  flex: 2;
-  position: sticky;
-  top: 20px;
-  align-self: flex-start;
-}
-
-.video-container {
-  position: relative;
-  padding-bottom: 56.25%;
-  height: 0;
-  margin-bottom: 20px;
-}
-
-#player {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-}
-
-.controls {
-  margin: 20px 0;
-  display: flex;
-  gap: 10px;
-}
-
-.controls input {
-  flex: 1;
-  padding: 10px;
-  font-size: 14px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
-
-.controls button {
-  padding: 10px 15px;
-  font-weight: bold;
-  background: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.controls button:hover {
-  background: #3367d6;
-}
-
-/* 자막 싱크 컨트롤 */
-.sync-controls-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin: 10px 0;
-  padding: 8px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
-}
+    // 자막 싱크 조절 버튼 이벤트 리스너
+    document.getElementById('sync-backward').addEventListener('click', function() {
+        syncOffset -= 1;
+        updateSyncStatus(syncOffset);
+    });
     
-.dictation-shortcut-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-#jump-to-dictation-btn {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  background-color: #ffb74d;
-  color: #4e342e;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-#jump-to-dictation-btn:hover:not(:disabled) {
-  background-color: #ffa726;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-}
-
-#jump-to-dictation-btn:disabled {
-  background-color: #e0e0e0;
-  color: #9e9e9e;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-#jump-to-line344-btn {
-  padding: 6px 14px;
-  border: none;
-  border-radius: 20px;
-  font-weight: 600;
-  background-color: #66bb6a;
-  color: white;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.2s, transform 0.2s, box-shadow 0.2s;
-}
-
-#jump-to-line344-btn:hover:not(:disabled) {
-  background-color: #4caf50;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-}
-
-#jump-to-line344-btn:disabled {
-  background-color: #e0e0e0;
-  color: #9e9e9e;
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.shortcut-hint {
-  font-size: 0.85rem;
-  color: #666;
-}
-
-.sync-controls-container button {
-  padding: 5px 10px;
-  margin: 0 10px;
-  background-color: #4285f4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
+    document.getElementById('sync-forward').addEventListener('click', function() {
+        syncOffset += 1;
+        updateSyncStatus(syncOffset);
+    });
     
-.sync-controls-container button:hover {
-  background-color: #3367d6;
-}
+    // 자막 데이터 자동 로드
+    fetchSubtitles();
     
-#sync-status {
-  font-weight: bold;
-  color: #333;
+    // 방문한 어휘 스타일 추가
+    const style = document.createElement('style');
+    style.textContent = `
+        .vocab-study.visited {
+            background-color: #d4f1f8;
+            color: #006064;
+            border: 1px solid #00838f;
+        }
+        
+        .vocab-study.active.visited {
+            background-color: #80deea;
+            color: #004d56;
+            border: 1px solid #006064;
+        }
+
+        .vocab-dictation.visited {
+            background-color: #ffe6cc;
+            color: #bf360c;
+            border: 1px solid #ff9800;
+        }
+
+        .vocab-dictation.active.visited {
+            background-color: #ffd699;
+            color: #e65100;
+            border: 1px solid #f57c00;
+        }
+    `;
+    document.head.appendChild(style);
+});
+
+// 싱크 상태 업데이트
+function updateSyncStatus(offset) {
+    document.getElementById('sync-status').textContent = `자막 싱크: ${offset}초`;
 }
 
-.subtitle-container {
-  max-height: 400px; /* 더 높게 조정 */
-  overflow-y: auto;
-  background: #fafafa;
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 5px;
-  font-size: 16px;
+// 중국어 발음 재생 (Web Speech API 사용)
+function speakChinese(text) {
+    if ('speechSynthesis' in window) {
+        // 음성 합성 객체 생성
+        const utterance = new SpeechSynthesisUtterance(text);
+        
+        // 중국어(표준어)로 설정
+        utterance.lang = 'zh-CN';
+        
+        // 음성 재생
+        window.speechSynthesis.speak(utterance);
+    } else {
+        console.warn('이 브라우저는 음성 합성을 지원하지 않습니다.');
+        alert('이 브라우저는 음성 합성을 지원하지 않습니다. 최신 Chrome, Firefox, Safari, Edge 등의 브라우저를 사용해주세요.');
+    }
 }
 
-.subtitle-line {
-  position: relative;
-  margin: 12px 0;
-  padding: 10px;
-  border-radius: 4px;
-  transition: all 0.3s;
-  border-bottom: 1px solid #eee;
+// 시간 문자열을 초 단위로 변환
+function timeStringToSeconds(timeStr) {
+    const [hms, ms] = timeStr.split(',');
+    const [h, m, s] = hms.split(':').map(Number);
+    return h * 3600 + m * 60 + s + (parseInt(ms) || 0) / 1000;
 }
 
-.subtitle-line.highlight {
-  background-color: #fff8dc;
-  border-left: 3px solid #ffc107;
-  transform: translateX(3px);
+// YouTube API 준비 완료 시 호출
+function onYouTubeIframeAPIReady() {
+    console.log("YouTube API 로드됨");
+    player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        videoId: fixedVideoId, // 고정 비디오 ID 사용
+        playerVars: {
+            autoplay: 0,
+            controls: 1,
+            rel: 0,
+            modestbranding: 1
+        },
+        events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+        }
+    });
 }
 
-.subtitle-line.dictation-focus {
-  box-shadow: 0 0 0 3px rgba(239, 108, 0, 0.25);
-  border-left: 4px solid #ef6c00;
-  background-color: #fff3e0;
+// 플레이어 준비 완료
+function onPlayerReady(event) {
+    console.log('YouTube 플레이어 준비됨, 고정 비디오 ID:', fixedVideoId);
 }
 
-/* 반복 재생 버튼 스타일 */
-.repeat-btn {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 4px 8px;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8em;
+// 플레이어 상태 변경
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        // 재생 시 자막 하이라이트 업데이트 시작
+        clearInterval(window.subtitleInterval);
+        window.subtitleInterval = setInterval(updateSubtitleHighlight, 100);
+    } else if (event.data === YT.PlayerState.ENDED) {
+        // 반복 재생 중이라면, 다시 재생
+        if (loopingInterval !== null && currentSubtitleIndex >= 0) {
+            playSubtitleSegment(currentSubtitleIndex);
+        }
+    } else {
+        // 일시 정지 시 자막 하이라이트 업데이트 중지
+        clearInterval(window.subtitleInterval);
+    }
 }
+
+// 자막 데이터 가져오기
+async function fetchSubtitles() {
+    try {
+        // 여기에 자막 파일의 경로를 지정하세요
+        const res = await fetch('shanzhashuzhilian_cnkr_converted.json');
+        const raw = await res.json();
+        subtitles = raw.map(item => ({
+            line: item.line || 0,
+            start: timeStringToSeconds(item.start_time),
+            end: timeStringToSeconds(item.end_time),
+            text_cn: item.text_cn || "",
+            text_kr: item.text_kr || "",
+            vocabulary: (item.vocabulary || []).map(v => {
+                const {
+                    word = "",
+                    meaning = "",
+                    pinyin = "",
+                    example = "",
+                    quiz = undefined,
+                    type = "study"
+                } = v;
+                return { word, meaning, pinyin, example, quiz, type };
+            })
+        }));
+        displaySubtitles();
+    } catch (err) {
+        console.error("자막 로드 오류:", err);
+        document.getElementById('subtitles').innerHTML =
+            "<div class='error'>자막 데이터를 불러오는 데 실패했습니다. 오류: " + err.message + "</div>";
+    }
+}
+
+// 자막 화면에 표시
+function displaySubtitles() {
+    const container = document.getElementById('subtitles');
+    container.innerHTML = '';
     
-.repeat-btn.study {
-  background-color: #673ab7;
-}
+    firstDictationIndex = -1;
+    clearDictationFocus();
+    const dictationEntries = [];
 
-.repeat-btn.study:hover {
-  background-color: #5e35b1;
-}
+    subtitles.forEach((sub, index) => {
+        const div = document.createElement('div');
+        div.className = 'subtitle-line';
+        div.dataset.index = index;
+        
+        let cn = sub.text_cn;
+        const hasDictation = sub.vocabulary && sub.vocabulary.some(v => (v.type || 'study') === 'dictation');
+        div.dataset.dictation = hasDictation ? 'true' : 'false';
+        // line 445를 첫 번째 받아쓰기 구간으로 우선 지정
+        if (hasDictation && sub.line === 445) {
+            firstDictationIndex = index;
+        }
+        // line 445가 없으면 첫 번째 받아쓰기를 찾음
+        if (hasDictation && firstDictationIndex === -1) {
+            firstDictationIndex = index;
+        }
+        
+        // 어휘가 있을 경우 블랭크 처리
+        if (sub.vocabulary && sub.vocabulary.length) {
+            sub.vocabulary.forEach(v => {
+                // 단어를 정규식으로 찾아 블랭크로 대체
+                const wordPattern = new RegExp(v.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+                // 퀴즈 데이터도 함께 저장
+                const quizData = v.quiz ? JSON.stringify(v.quiz).replace(/"/g, '&quot;') : '';
+                const type = v.type || 'study';
+                const typeClass = type === 'dictation' ? 'vocab-dictation' : 'vocab-study';
+                const safeWord = (v.word || '').replace(/'/g, '&#39;');
+                const safeMeaning = (v.meaning || '').replace(/'/g, '&#39;');
+                const safePinyin = (v.pinyin || '').replace(/'/g, '&#39;');
+                const safeExample = (v.example || '').replace(/'/g, '&#39;');
+                cn = cn.replace(
+                    wordPattern,
+                    `<span class='vocab ${typeClass}' data-type='${type}' data-word='${safeWord}' data-pinyin='${safePinyin}' data-meaning='${safeMeaning}' data-example='${safeExample}' data-quiz='${quizData}'>____</span>`
+                );
+            });
+        }
+        
+        // 반복 청취 버튼 추가
+        const repeatBtnClass = hasDictation ? 'repeat-btn dictation' : 'repeat-btn study';
+        
+        // line 478에 line 344로 이동하는 버튼 추가
+        let extraButton = '';
+        // line 번호를 숫자로 비교 (문자열일 수도 있으므로)
+        if (sub.line === 478 || sub.line === '478' || Number(sub.line) === 478) {
+            extraButton = '<button class="jump-to-line344-from-478-btn" style="position: absolute; right: 80px; top: 50%; transform: translateY(-50%); padding: 4px 8px; background-color: #66bb6a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8em; z-index: 10;">Line 344로 이동</button>';
+        }
+        
+        div.innerHTML = `
+            <div class="cn-text">${cn}</div>
+            <div class="kr-text">${sub.text_kr}</div>
+            <button class="${repeatBtnClass}" data-index="${index}">반복</button>
+            ${extraButton}
+        `;
+        
+        container.appendChild(div);
+        
+        // line 478의 버튼에 이벤트 리스너 추가
+        if (sub.line === 478 || sub.line === '478' || Number(sub.line) === 478) {
+            const jumpBtn = div.querySelector('.jump-to-line344-from-478-btn');
+            if (jumpBtn) {
+                jumpBtn.addEventListener('click', () => {
+                    jumpToLine344();
+                });
+            }
+        }
+
+        if (hasDictation) {
+            const dictationCn = cn
+                .replace(/<span[^>]*>____<\/span>/g, '(   )')
+                .replace(/<[^>]+>/g, '');
+            dictationEntries.push({
+                index,
+                cn: dictationCn,
+                kr: sub.text_kr || ''
+            });
+        }
+    });
     
-.repeat-btn.active {
-  background-color: #ff5722;
-}
+    updateDictationShortcutState();
+    updateLine344ButtonState();
+    renderDictationLines(dictationEntries);
 
-.repeat-btn.dictation {
-  background-color: #ef6c00;
-}
-
-.repeat-btn.dictation:hover {
-  background-color: #e65100;
-}
-
-.repeat-btn.dictation.active {
-  background-color: #d84315;
-}
-
-/* 반복 재생 알림창 */
-.repeat-notification {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 15px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  z-index: 1000;
-}
+    // 블랭크 클릭 이벤트 추가
+    document.querySelectorAll('.vocab').forEach(el => {
+        el.addEventListener('click', (e) => {
+            // 클릭한 어휘 하이라이트
+            document.querySelectorAll('.vocab').forEach(v => v.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // 어휘 정보 표시
+            const decode = (value) => (value || '').replace(/&#39;/g, "'");
+            const word = decode(e.target.dataset.word);
+            const meaning = decode(e.target.dataset.meaning);
+            const pinyin = decode(e.target.dataset.pinyin);
+            const example = decode(e.target.dataset.example);
+            const quizData = e.target.dataset.quiz;
+            const type = e.target.dataset.type || 'study';
+            
+            displayVocabDetail(word, pinyin, meaning, example, quizData, type);
+            
+            // 퀴즈 데이터가 있으면 바로 퀴즈 시작 (3번 요구사항)
+            if (quizData && quizData !== 'undefined') {
+                startQuiz(word);
+            }
+            
+            // 클릭한 어휘 색상 변경 (4번 요구사항)
+            e.target.classList.add('visited');
+        });
+    });
     
-#stop-repeat-btn {
-  margin-left: 10px;
-  padding: 4px 8px;
-  background-color: #f44336;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
+    // 반복 재생 버튼 이벤트 추가 - 토글 기능 (2번 요구사항)
+    document.querySelectorAll('.repeat-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            
+            // 이미 활성화된 버튼이면 반복 중지
+            if (btn.classList.contains('active')) {
+                stopRepeatPlayback();
+                btn.textContent = '반복'; // 버튼 텍스트 원래대로
+            } else {
+                // 반복 시작
+                startRepeatPlayback(index);
+                
+                // 다른 모든 버튼의 텍스트는 '반복'으로
+                document.querySelectorAll('.repeat-btn').forEach(otherBtn => {
+                    if (otherBtn !== btn) {
+                        otherBtn.textContent = '반복';
+                    }
+                });
+            }
+        });
+    });
 }
 
-/* 중국어/한국어 텍스트 스타일 */
-.cn-text {
-  font-size: 18px;
-  margin-bottom: 6px;
-}
-
-.kr-text {
-  font-size: 14px;
-  color: #666;
-}
-
-/* 어휘 블랭크 스타일 */
-.vocab {
-  display: inline-block;
-  padding: 0 4px;
-  border-radius: 3px;
-  cursor: pointer;
-  position: relative;
-  border: 1px dashed transparent;
-  margin: 0 2px;
-  transition: background-color 0.2s;
-}
-
-.vocab-study {
-  background-color: #e0f7fa;
-  color: #006064;
-  border-color: #00838f;
-}
-
-.vocab-study:hover, .vocab-study.active {
-  background-color: #4dd0e1;
-  color: white;
-}
-
-.vocab-dictation {
-  background-color: #fff4e5;
-  color: #bf360c;
-  border: 1px solid #ffb74d;
-}
-
-.vocab-dictation:hover, .vocab-dictation.active {
-  background-color: #ffe0b2;
-  color: #e65100;
-}
-
-.vocab-type-badge {
-  margin-left: 8px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  background-color: #e0e0e0;
-  color: #424242;
-}
-
-.vocab-type-badge.study {
-  background-color: #e3f2fd;
-  color: #1565c0;
-}
-
-.vocab-type-badge.dictation {
-  background-color: #ffe0b2;
-  color: #ef6c00;
-}
-
-/* 어휘 상세 정보 패널 */
-.vocab-detail-container {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  position: sticky;
-  top: 20px;
-  transition: all 0.3s;
-}
-
-.vocab-detail-container:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.vocab-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 12px;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.vocab-title {
-  color: #333;
-  font-size: 1.8rem;
-  font-weight: bold;
-}
-
-.pronunciation-btn {
-  background-color: #3498db;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  transition: background-color 0.2s;
-}
-
-.pronunciation-btn:hover {
-  background-color: #2980b9;
-}
-
-.vocab-content {
-  background-color: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-#vocab-detail[data-type="dictation"] .vocab-content {
-  border: 2px dashed #ffcc80;
-  box-shadow: 0 4px 18px rgba(239, 108, 0, 0.15);
-}
-
-#vocab-detail[data-type="dictation"] .vocab-header {
-  border-bottom-color: rgba(239, 108, 0, 0.3);
-}
-
-#vocab-detail[data-type="dictation"] .pronunciation-btn {
-  background-color: #ef6c00;
-}
-
-#vocab-detail[data-type="dictation"] .pronunciation-btn:hover {
-  background-color: #e65100;
-}
-
-.pinyin {
-  color: #3498db;
-  font-size: 1.2rem;
-  margin-bottom: 15px;
-}
-
-.meaning {
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px dashed #ddd;
-}
-
-.example {
-  margin-top: 15px;
-}
-
-.example-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
+function updateDictationShortcutState() {
+    const btn = document.getElementById('jump-to-dictation-btn');
+    if (!btn) return;
     
-#example-pronunciation-btn {
-  font-size: 0.85em;
-  padding: 3px 8px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-    
-#example-pronunciation-btn:hover {
-  background-color: #45a049;
+    if (firstDictationIndex >= 0) {
+        btn.disabled = false;
+        btn.title = '첫 번째 받아쓰기 구간으로 이동합니다.';
+    } else {
+        btn.disabled = true;
+        btn.title = '받아쓰기 블랭크가 있는 구간이 없습니다.';
+    }
 }
 
-.example-cn {
-  font-size: 1.1rem;
-  margin-bottom: 5px;
+function updateLine344ButtonState() {
+    const btn = document.getElementById('jump-to-line344-btn');
+    if (!btn) return;
+    
+    const line344Index = subtitles.findIndex(sub => sub.line === 344);
+    if (line344Index >= 0) {
+        btn.disabled = false;
+        btn.title = 'Line 344로 이동합니다.';
+    } else {
+        btn.disabled = true;
+        btn.title = 'Line 344를 찾을 수 없습니다.';
+    }
 }
 
-.example-kr {
-  color: #666;
-  font-size: 0.95rem;
+function clearDictationFocus() {
+    document.querySelectorAll('.subtitle-line.dictation-focus').forEach(el => {
+        el.classList.remove('dictation-focus');
+    });
 }
 
-/* 어휘배열 퀴즈 스타일 */
-#vocab-quiz-container {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  border: 1px solid #e0e0e0;
-}
+function jumpToFirstDictation() {
+    if (firstDictationIndex < 0) return;
     
-.quiz-info {
-  text-align: center;
-}
+    const target = document.querySelector(`.subtitle-line[data-index='${firstDictationIndex}']`);
+    if (!target) return;
     
-.quiz-info h4 {
-  margin-top: 0;
-  color: #333;
-}
-    
-#start-quiz-btn {
-  padding: 8px 16px;
-  background-color: #ff9800;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-    
-#start-quiz-btn:hover {
-  background-color: #f57c00;
-}
-    
-.quiz-content {
-  margin-top: 10px;
-}
-    
-.quiz-sentence {
-  font-size: 1.1em;
-  margin: 15px 0;
-  padding: 10px;
-  background-color: #fff3e0;
-  border-radius: 5px;
-  border-left: 3px solid #ff9800;
-}
-    
-.tokens-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-    
-.token-btn {
-  padding: 8px 12px;
-  background-color: #e0e0e0;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-    
-.token-btn:hover {
-  background-color: #bdbdbd;
-}
-    
-.token-btn.selected {
-  background-color: #bdbdbd;
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-    
-.answer-container {
-  min-height: 50px;
-  padding: 10px;
-  background-color: #f5f5f5;
-  border: 2px dashed #9e9e9e;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-    
-.answer-token {
-  display: inline-block;
-  padding: 6px 10px;
-  background-color: #81c784;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-    
-.answer-token:hover {
-  background-color: #66bb6a;
-}
-    
-.quiz-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 15px;
-}
-    
-#check-answer-btn, #reset-quiz-btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-}
-    
-#check-answer-btn {
-  background-color: #4caf50;
-  color: white;
-}
-    
-#check-answer-btn:hover {
-  background-color: #43a047;
-}
-    
-#reset-quiz-btn {
-  background-color: #f44336;
-  color: white;
-}
-    
-#reset-quiz-btn:hover {
-  background-color: #e53935;
-}
-    
-.quiz-result {
-  margin-top: 20px;
-  padding: 10px;
-}
-    
-.correct {
-  color: #43a047;
-  font-weight: bold;
-  font-size: 1.1em;
-  text-align: center;
-}
-    
-.incorrect {
-  color: #e53935;
-  font-weight: bold;
-  font-size: 1.1em;
-  text-align: center;
-}
-    
-.correct-sentence {
-  margin-top: 10px;
-  padding: 10px;
-  background-color: #e8f5e9;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 1.1em;
+    clearDictationFocus();
+    target.classList.add('dictation-focus');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
 }
 
-.progress-section {
-  margin-top: 20px;
+function jumpToLine344() {
+    // line 344를 찾아서 이동
+    const line344Index = subtitles.findIndex(sub => sub.line === 344);
+    if (line344Index < 0) return;
+    
+    const target = document.querySelector(`.subtitle-line[data-index='${line344Index}']`);
+    if (!target) return;
+    
+    clearDictationFocus();
+    target.classList.add('dictation-focus');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
 }
 
-.progress-title {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-  color: #555;
-  font-size: 0.9rem;
+// 어휘 정보 표시
+function displayVocabDetail(word, pinyin, meaning, example, quizData, type = 'study') {
+    document.getElementById('no-vocab-message').style.display = 'none';
+    document.getElementById('vocab-content').style.display = 'block';
+    
+    document.getElementById('vocab-title').textContent = word;
+    
+    const detailEl = document.getElementById('vocab-detail');
+    if (detailEl) {
+        detailEl.dataset.type = type;
+    }
+
+    const pinyinEl = document.getElementById('vocab-pinyin');
+    const meaningEl = document.getElementById('vocab-meaning');
+    const typeBadgeEl = document.getElementById('vocab-type-badge');
+    
+    pinyinEl.textContent = pinyin;
+    pinyinEl.style.display = pinyin ? 'block' : 'none';
+    
+    const meaningText = meaning || (type === 'dictation' ? '받아쓰기용 블랭크 (설명 없음)' : '');
+    meaningEl.textContent = meaningText;
+    meaningEl.style.display = meaningText ? 'block' : 'none';
+    
+    if (typeBadgeEl) {
+        typeBadgeEl.textContent = type === 'dictation' ? '받아쓰기' : '학습';
+        typeBadgeEl.classList.remove('dictation', 'study');
+        typeBadgeEl.classList.add(type === 'dictation' ? 'dictation' : 'study');
+        typeBadgeEl.style.display = 'inline-block';
+    }
+    
+    // 예문 분리 (중국어/한국어)
+    const exampleContainer = document.querySelector('#vocab-content .example');
+    if (example && example.trim().length) {
+        const exampleParts = example.split('(');
+        if (exampleParts.length > 1) {
+            document.getElementById('vocab-example-cn').textContent = exampleParts[0].trim();
+            document.getElementById('vocab-example-kr').textContent = '(' + exampleParts[1];
+        } else {
+            document.getElementById('vocab-example-cn').textContent = example;
+            document.getElementById('vocab-example-kr').textContent = '';
+        }
+        exampleContainer.style.display = 'block';
+    } else if (exampleContainer) {
+        exampleContainer.style.display = 'none';
+        document.getElementById('vocab-example-cn').textContent = '';
+        document.getElementById('vocab-example-kr').textContent = '';
+    }
+    
+    // 퀴즈 정보 처리 - 퀴즈 버튼 숨기기 (자동 시작으로 변경)
+    document.getElementById('vocab-quiz-container').style.display = 'none';
 }
 
-.progress-bar-container {
-  height: 6px;
-  background-color: rgba(255, 255, 255, 0.5);
-  border-radius: 3px;
-  overflow: hidden;
+// 현재 자막 하이라이트 업데이트
+function updateSubtitleHighlight() {
+    if (!player || !subtitles.length) return;
+    
+    // 현재 재생 시간에 싱크 오프셋 적용
+    const currentTime = player.getCurrentTime() + syncOffset;
+    
+    let activeSubtitleFound = false;
+    
+    subtitles.forEach((sub, index) => {
+        const el = document.querySelector(`.subtitle-line[data-index='${index}']`);
+        if (!el) return;
+        
+        // 현재 자막의 시작과 끝 시간 확인
+        if (currentTime >= sub.start && currentTime <= sub.end) {
+            // 현재 재생 중인 자막 하이라이트
+            if (!el.classList.contains('highlight')) {
+                el.classList.add('highlight');
+                el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+                currentSubtitleIndex = index;
+            }
+            activeSubtitleFound = true;
+        } else if (index !== currentSubtitleIndex) {
+            // 현재 활성화된 자막이 아니면 하이라이트 제거
+            el.classList.remove('highlight');
+        }
+    });
+    
+    // 만약 활성화된 자막이 없고, 현재 시간이 다음 자막의 시작 시간보다 작으면
+    // 현재 활성화된 자막의 하이라이트 유지
+    if (!activeSubtitleFound && currentSubtitleIndex >= 0) {
+        const nextSubIndex = currentSubtitleIndex + 1;
+        
+        // 다음 자막이 있고, 현재 시간이 다음 자막의 시작 시간보다 작으면 하이라이트 유지
+        if (nextSubIndex < subtitles.length && currentTime < subtitles[nextSubIndex].start) {
+            // 하이라이트 유지 (아무 작업 안 함)
+        } else {
+            // 그렇지 않으면 하이라이트 제거
+            const currentEl = document.querySelector(`.subtitle-line[data-index='${currentSubtitleIndex}']`);
+            if (currentEl) {
+                currentEl.classList.remove('highlight');
+            }
+            currentSubtitleIndex = -1;
+        }
+    }
 }
 
-.progress-bar {
-  height: 100%;
-  background-color: #4CAF50;
-  width: 0%;
-  transition: width 0.5s;
+// 어휘 배열 퀴즈 시작
+function startQuiz(word) {
+    // 클릭한 어휘의 퀴즈 데이터 가져오기
+    const vocabElement = document.querySelector(`.vocab.active`);
+    if (!vocabElement) return;
+    
+    const quizDataStr = vocabElement.dataset.quiz;
+    if (!quizDataStr) {
+        console.error('퀴즈 데이터가 없습니다.');
+        return;
+    }
+    
+    try {
+        const quizData = JSON.parse(quizDataStr.replace(/&quot;/g, '"'));
+        
+        // 퀴즈 UI 생성 - 전체 문장은 표시하지 않음
+        const quizContainer = document.getElementById('vocab-quiz-container');
+        quizContainer.innerHTML = `
+            <div class="quiz-content">
+                <h3>어휘 배열 퀴즈</h3>
+                <p>다음 단어들을 올바른 순서로 배열하세요:</p>
+                <div class="tokens-container"></div>
+                <div class="answer-container"></div>
+                <div class="quiz-buttons">
+                    <button id="check-answer-btn">정답 확인</button>
+                    <button id="reset-quiz-btn">다시 시작</button>
+                </div>
+                <div class="quiz-result"></div>
+            </div>
+        `;
+        quizContainer.style.display = 'block';
+        
+        // 토큰(단어) 버튼 생성
+        const tokensContainer = quizContainer.querySelector('.tokens-container');
+        const shuffledTokens = [...quizData.tokens].sort(() => Math.random() - 0.5);
+        
+        shuffledTokens.forEach(token => {
+            const tokenBtn = document.createElement('button');
+            tokenBtn.className = 'token-btn';
+            tokenBtn.textContent = token;
+            tokenBtn.addEventListener('click', () => {
+                // 이미 선택된 토큰은 다시 선택 불가
+                if (tokenBtn.classList.contains('selected')) return;
+                
+                // 토큰 선택 처리
+                tokenBtn.classList.add('selected');
+                
+                // 답변 영역에 토큰 추가
+                const answerContainer = quizContainer.querySelector('.answer-container');
+                const answerToken = document.createElement('span');
+                answerToken.className = 'answer-token';
+                answerToken.textContent = token;
+                answerToken.dataset.original = token;
+                
+                // 토큰 클릭 시 제거 기능
+                answerToken.addEventListener('click', () => {
+                    // 답변에서 토큰 제거
+                    answerToken.remove();
+                    
+                    // 토큰 버튼 다시 활성화
+                    const tokenBtns = tokensContainer.querySelectorAll('.token-btn');
+                    for (let btn of tokenBtns) {
+                        if (btn.textContent === token && btn.classList.contains('selected')) {
+                            btn.classList.remove('selected');
+                            break;
+                        }
+                    }
+                });
+                
+                answerContainer.appendChild(answerToken);
+            });
+            tokensContainer.appendChild(tokenBtn);
+        });
+        
+        // 정답 확인 버튼 이벤트
+        quizContainer.querySelector('#check-answer-btn').addEventListener('click', () => {
+            const answerTokens = quizContainer.querySelectorAll('.answer-token');
+            const userAnswer = Array.from(answerTokens).map(token => token.dataset.original);
+            
+            const resultElement = quizContainer.querySelector('.quiz-result');
+            
+            // 정답 비교
+            let isCorrect = true;
+            if (userAnswer.length !== quizData.tokens.length) {
+                isCorrect = false;
+            } else {
+                for (let i = 0; i < userAnswer.length; i++) {
+                    if (userAnswer[i] !== quizData.tokens[i]) {
+                        isCorrect = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (isCorrect) {
+                resultElement.innerHTML = `
+                    <div class="correct">정답입니다! 👏</div>
+                    <div class="correct-sentence">${quizData.text_cn}</div>
+                `;
+                // 문장 발음 버튼 추가
+                const pronunciationBtn = document.createElement('button');
+                pronunciationBtn.className = 'pronunciation-btn';
+                pronunciationBtn.textContent = '문장 발음 듣기';
+                pronunciationBtn.addEventListener('click', () => {
+                    speakChinese(quizData.text_cn);
+                });
+                resultElement.appendChild(pronunciationBtn);
+            } else {
+                resultElement.innerHTML = `
+                    <div class="incorrect">틀렸습니다. 다시 시도해보세요.</div>
+                `;
+            }
+        });
+        
+        // 퀴즈 리셋 버튼 이벤트
+        quizContainer.querySelector('#reset-quiz-btn').addEventListener('click', () => {
+            // 토큰 버튼 초기화
+            const tokenBtns = tokensContainer.querySelectorAll('.token-btn');
+            tokenBtns.forEach(btn => btn.classList.remove('selected'));
+            
+            // 답변 영역 초기화
+            quizContainer.querySelector('.answer-container').innerHTML = '';
+            
+            // 결과 초기화
+            quizContainer.querySelector('.quiz-result').innerHTML = '';
+        });
+        
+    } catch (e) {
+        console.error('퀴즈 시작 오류:', e);
+        alert('퀴즈를 시작하는 중 오류가 발생했습니다.');
+    }
 }
 
-.vocab-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  color: #777;
-  font-size: 0.85rem;
+// 특정 자막 세그먼트 재생
+function playSubtitleSegment(index) {
+    if (!player || index < 0 || index >= subtitles.length) return;
+    
+    const subtitle = subtitles[index];
+    // 싱크 오프셋 적용하여 시작 시간 계산
+    const startTime = Math.max(0, subtitle.start - syncOffset);
+    
+    // 비디오 해당 위치로 이동하고 재생
+    player.seekTo(startTime, true);
+    player.playVideo();
 }
 
-.no-vocab-selected {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 250px;
-  color: #aaa;
-  text-align: center;
-  font-style: italic;
+// 반복 재생 시작
+function startRepeatPlayback(index) {
+    // 기존 반복 재생 중지
+    stopRepeatPlayback();
+    
+    if (!player || index < 0 || index >= subtitles.length) return;
+    
+    const subtitle = subtitles[index];
+    
+    // 싱크 오프셋 적용하여 시작/종료 시간 계산
+    const startTime = Math.max(0, subtitle.start - syncOffset);
+    const endTime = subtitle.end - syncOffset;
+    
+    // 구간이 너무 짧으면 최소 재생 시간 보장 (최소 3초)
+    const minDuration = 3;
+    const actualEndTime = (endTime - startTime < minDuration) ? startTime + minDuration : endTime;
+    
+    console.log(`반복 재생 설정: 시작=${startTime.toFixed(2)}초, 종료=${actualEndTime.toFixed(2)}초, 구간=${(actualEndTime-startTime).toFixed(2)}초`);
+    
+    // 해당 세그먼트 재생 시작
+    player.seekTo(startTime, true);
+    player.playVideo();
+    
+    // 반복 재생을 위한 인터벌 설정
+    loopingInterval = setInterval(() => {
+        const currentTime = player.getCurrentTime();
+        // 현재 시간이 종료 시간을 지났거나 가까우면 다시 시작 지점으로 이동
+        if (currentTime >= actualEndTime - 0.3) {
+            player.seekTo(startTime, true);
+        }
+    }, 200); // 더 자주 체크 (200ms마다)
+    
+    // 반복 버튼 활성화 표시
+    document.querySelectorAll('.repeat-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    const activeBtn = document.querySelector(`.repeat-btn[data-index="${index}"]`);
+    activeBtn.classList.add('active');
+    activeBtn.textContent = '중지'; // 버튼 텍스트 변경
+    
+    // 현재 반복 중인 인덱스 저장
+    currentSubtitleIndex = index;
 }
 
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .main-content {
-    flex-direction: column;
-  }
-  
-  .right-panel {
-    position: static;
-    margin-top: 20px;
-  }
-  
-  .vocab-detail-container {
-    position: static;
-  }
-  
-  .tokens-container {
-    flex-direction: column;
-    gap: 5px;
-  }
-  
-  .quiz-buttons {
-    flex-direction: column;
-    gap: 10px;
-  }
+// 반복 재생 중지
+function stopRepeatPlayback() {
+    if (loopingInterval !== null) {
+        clearInterval(loopingInterval);
+        loopingInterval = null;
+        
+        // 반복 버튼 비활성화 및 텍스트 원래대로
+        document.querySelectorAll('.repeat-btn').forEach(btn => {
+            btn.classList.remove('active');
+            btn.textContent = '반복';
+        });
+    }
+}
+
+function renderDictationLines(lines) {
+    const container = document.getElementById('dictation-lines');
+    if (!container) return;
+
+    if (!lines.length) {
+        container.innerHTML = '<div class="dictation-line-item"><div class="dictation-kr">받아쓰기 블랭크가 포함된 자막이 없습니다.</div></div>';
+        return;
+    }
+
+    const escapeHtml = (str = '') =>
+        str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+    container.innerHTML = lines.map(({ index, cn, kr }) => `
+        <div class="dictation-line-item" data-index="${index}">
+            <div class="dictation-cn">${escapeHtml(cn)}</div>
+            ${kr ? `<div class="dictation-kr">${escapeHtml(kr)}</div>` : ''}
+        </div>
+    `).join('');
+
+    container.querySelectorAll('.dictation-line-item').forEach(item => {
+        item.addEventListener('click', () => {
+            const idx = parseInt(item.dataset.index, 10);
+            const target = document.querySelector(`.subtitle-line[data-index='${idx}']`);
+            if (target) {
+                clearDictationFocus();
+                target.classList.add('dictation-focus');
+                target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+            }
+        });
+    });
 }
