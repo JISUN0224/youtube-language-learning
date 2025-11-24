@@ -4527,7 +4527,16 @@
     "start_time": "00:41:20,975",
     "end_time": "00:41:22,796",
     "text_cn": "踏踏实实的",
-    "text_kr": "얌전하게 잘 있고"
+    "text_kr": "얌전하게 잘 있고",
+    "vocabulary": [
+      {
+        "word": "踏踏实实",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 446,
@@ -4583,7 +4592,16 @@
     "start_time": "00:41:33,200",
     "end_time": "00:41:34,279",
     "text_cn": "你哭什么呀",
-    "text_kr": "왜 울고 그래"
+    "text_kr": "왜 울고 그래",
+    "vocabulary": [
+      {
+        "word": "哭什么",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 454,
@@ -4681,7 +4699,16 @@
     "start_time": "00:42:32,440",
     "end_time": "00:42:34,532",
     "text_cn": "一年的转正期是个考验",
-    "text_kr": "1년간의 수습기간은 일종의 테스트라고 보면 된다"
+    "text_kr": "1년간의 수습기간은 일종의 테스트라고 보면 된다",
+    "vocabulary": [
+      {
+        "word": "考验",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 468,
@@ -4709,7 +4736,23 @@
     "start_time": "00:42:42,200",
     "end_time": "00:42:44,552",
     "text_cn": "我主动要求参加修整篮球场的工作",
-    "text_kr": "저는 농구장 정비작업에 참가하겠습니다"
+    "text_kr": "저는 농구장 정비작업에 참가하겠습니다",
+    "vocabulary": [
+      {
+        "word": "主动",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      },
+      {
+        "word": "要求",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 472,
@@ -4737,7 +4780,23 @@
     "start_time": "00:43:27,510",
     "end_time": "00:43:30,852",
     "text_cn": "是我主动要求锻炼的",
-    "text_kr": "내가 자원한 거야"
+    "text_kr": "내가 자원한 거야",
+    "vocabulary": [
+      {
+        "word": "主动",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      },
+      {
+        "word": "要求",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 476,
@@ -4758,7 +4817,16 @@
     "start_time": "00:44:33,292",
     "end_time": "00:44:35,482",
     "text_cn": "千万别让人看见咱俩在一块",
-    "text_kr": "우리 둘이 같이 있는 거 들키면 안돼"
+    "text_kr": "우리 둘이 같이 있는 거 들키면 안돼",
+    "vocabulary": [
+      {
+        "word": "千万别让人看见",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 479,
@@ -4814,7 +4882,16 @@
     "start_time": "00:44:47,500",
     "end_time": "00:44:49,283",
     "text_cn": "修篮球场又不是修战壕",
-    "text_kr": "농구장 고르는게 전쟁 참호를 파는 건 아니잖아"
+    "text_kr": "농구장 고르는게 전쟁 참호를 파는 건 아니잖아",
+    "vocabulary": [
+      {
+        "word": "又不是",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 487,
@@ -4870,7 +4947,16 @@
     "start_time": "00:45:16,881",
     "end_time": "00:45:17,938",
     "text_cn": "应当放松一下",
-    "text_kr": "조금 쉬어야 한다고 하셨느니라"
+    "text_kr": "조금 쉬어야 한다고 하셨느니라",
+    "vocabulary": [
+      {
+        "word": "放松一下",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 495,
@@ -4905,7 +4991,16 @@
     "start_time": "00:45:26,327",
     "end_time": "00:45:30,155",
     "text_cn": "要不商店里怎么会卖呢",
-    "text_kr": "아니라면 상점에서 이걸 왜 팔겠어"
+    "text_kr": "아니라면 상점에서 이걸 왜 팔겠어",
+    "vocabulary": [
+      {
+        "word": "怎么会",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 500,
@@ -4933,7 +5028,16 @@
     "start_time": "00:46:51,588",
     "end_time": "00:46:55,408",
     "text_cn": "你就穿成这样",
-    "text_kr": "왜 그렇게 입었어"
+    "text_kr": "왜 그렇게 입었어",
+    "vocabulary": [
+      {
+        "word": "穿成这样",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 504,
@@ -4961,21 +5065,55 @@
     "start_time": "00:48:09,616",
     "end_time": "00:48:13,428",
     "text_cn": "你睡就是了, 干嘛叫你",
-    "text_kr": "자고 있는데，뭐하러 깨워"
+    "text_kr": "자고 있는데，뭐하러 깨워",
+    "vocabulary": [
+      {
+        "word": "睡就是了",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      },
+      {
+        "word": "干嘛叫你",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 508,
     "start_time": "00:48:14,531",
     "end_time": "00:48:16,546",
     "text_cn": "好不容易见你一面",
-    "text_kr": "어렵게 얼굴 보러 왔는데"
+    "text_kr": "어렵게 얼굴 보러 왔는데",
+    "vocabulary": [
+      {
+        "word": "好不容易",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 509,
     "start_time": "00:48:16,570",
     "end_time": "00:48:18,584",
     "text_cn": "给睡过去了",
-    "text_kr": "깜빡 잠이 들어 버렸네"
+    "text_kr": "깜빡 잠이 들어 버렸네",
+    "vocabulary": [
+      {
+        "word": "睡过去",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 510,
