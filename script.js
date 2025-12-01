@@ -213,11 +213,11 @@ function displaySubtitles() {
         let cn = sub.text_cn;
         const hasDictation = sub.vocabulary && sub.vocabulary.some(v => (v.type || 'study') === 'dictation');
         div.dataset.dictation = hasDictation ? 'true' : 'false';
-        // line 445를 첫 번째 받아쓰기 구간으로 우선 지정
-        if (hasDictation && sub.line === 445) {
+        // line 545를 첫 번째 받아쓰기 구간으로 우선 지정
+        if (hasDictation && sub.line === 545) {
             firstDictationIndex = index;
         }
-        // line 445가 없으면 첫 번째 받아쓰기를 찾음
+        // line 545가 없으면 첫 번째 받아쓰기를 찾음
         if (hasDictation && firstDictationIndex === -1) {
             firstDictationIndex = index;
         }
