@@ -5379,7 +5379,16 @@
     "start_time": "00:53:41,729",
     "end_time": "00:53:43,752",
     "text_cn": "我不去, 万一碰上什么人呢",
-    "text_kr": "안 간다니까, 혹시라도 누구 만나면 어떡해"
+    "text_kr": "안 간다니까, 혹시라도 누구 만나면 어떡해",
+    "vocabulary": [
+      {
+        "word": "碰上",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 546,
@@ -5400,7 +5409,16 @@
     "start_time": "00:53:48,050",
     "end_time": "00:53:49,897",
     "text_cn": "我什么医院都不去",
-    "text_kr": "어디든 병원은 안 간다니까"
+    "text_kr": "어디든 병원은 안 간다니까",
+    "vocabulary": [
+      {
+        "word": "什么医院都不去",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 549,
@@ -5414,7 +5432,16 @@
     "start_time": "00:53:51,902",
     "end_time": "00:53:54,758",
     "text_cn": "我就是不去",
-    "text_kr": "안 간다니까"
+    "text_kr": "안 간다니까",
+    "vocabulary": [
+      {
+        "word": "我就是不去",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 551,
@@ -5449,7 +5476,16 @@
     "start_time": "00:54:59,845",
     "end_time": "00:55:02,458",
     "text_cn": "你以后不要这样了, 都吓死我啦",
-    "text_kr": "다시는 그러지마, 나 너무 놀랐단 말야"
+    "text_kr": "다시는 그러지마, 나 너무 놀랐단 말야",
+    "vocabulary": [
+      {
+        "word": "都吓死我啦",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 556,
@@ -5498,7 +5534,16 @@
     "start_time": "00:55:26,074",
     "end_time": "00:55:29,289",
     "text_cn": "你干脆坐前边吧",
-    "text_kr": "그냥 앞 쪽에 앉으면 어때"
+    "text_kr": "그냥 앞 쪽에 앉으면 어때",
+    "vocabulary": [
+      {
+        "word": "干脆",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 563,
@@ -5750,7 +5795,16 @@
     "start_time": "00:59:11,932",
     "end_time": "00:59:13,962",
     "text_cn": "学校随时可能清退她的",
-    "text_kr": "학교는 언제든 징치우를 쫓아낼 수 있어"
+    "text_kr": "학교는 언제든 징치우를 쫓아낼 수 있어",
+    "vocabulary": [
+      {
+        "word": "随时",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 599,
@@ -5764,7 +5818,16 @@
     "start_time": "00:59:17,335",
     "end_time": "00:59:19,196",
     "text_cn": "这都怪我",
-    "text_kr": "다 제 잘못입니다"
+    "text_kr": "다 제 잘못입니다",
+    "vocabulary": [
+      {
+        "word": "这都怪我",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 601,
@@ -5792,7 +5855,16 @@
     "start_time": "00:59:30,081",
     "end_time": "00:59:32,558",
     "text_cn": "可能不能理解我们这样的家庭",
-    "text_kr": "우리 같은 이런 집안을 이해할 수 없을 거다"
+    "text_kr": "우리 같은 이런 집안을 이해할 수 없을 거다",
+    "vocabulary": [
+      {
+        "word": "可能不能理解",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 605,
@@ -5939,7 +6011,16 @@
     "start_time": "01:00:46,112",
     "end_time": "01:00:48,102",
     "text_cn": "我就不回避了",
-    "text_kr": "내가 자리를 피해 줄 데가 없구나"
+    "text_kr": "내가 자리를 피해 줄 데가 없구나",
+    "vocabulary": [
+      {
+        "word": "不回避了",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 626,
@@ -5988,7 +6069,16 @@
     "start_time": "01:02:52,642",
     "end_time": "01:02:54,706",
     "text_cn": "你要跟我说实话",
-    "text_kr": "솔직하게 대답하거라"
+    "text_kr": "솔직하게 대답하거라",
+    "vocabulary": [
+      {
+        "word": "跟我说实话",
+        "meaning": "",
+        "pinyin": "",
+        "example": "",
+        "type": "dictation"
+      }
+    ]
   },
   {
     "line": 633,
